@@ -10,8 +10,7 @@ group = "com"
 version = "0.0.1"
 
 application {
-    mainClass = "io.ktor.server.netty.EngineMain"
-
+    mainClass.set("com.ApplicationKt")
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
@@ -31,3 +30,11 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
 
+// Configuración del ShadowJar proporcionado por el plugin de Ktor
+tasks {
+    shadowJar {
+        archiveBaseName.set("LevelUp")
+        archiveVersion.set("0.0.1")
+        archiveClassifier.set("all")
+    }
+}
