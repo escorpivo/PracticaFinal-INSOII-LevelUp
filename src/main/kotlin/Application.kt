@@ -9,8 +9,13 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
+import io.github.cdimascio.dotenv.dotenv
+
+//cargamos el .env
+val dotenv = dotenv()
 
 fun main() {
+
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
         module()
     }.start(wait = true)
@@ -26,8 +31,8 @@ fun Application.module() {
 
     //hay que crear un .env para evitar que los datos viajen por aqui
     val igdbClient = IGDBClient(
-        clientId = "null",
-        clientSecret = "null"
+        clientId = dotenv["CLIENT_ID"] ?: error("CLIENT_ID no encontrado"),
+        clientSecret = dotenv["CLIENT_SECRET"] ?: error("CLIENT_SECRET no encontrado")
     )
 
     routing {
