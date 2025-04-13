@@ -1,16 +1,16 @@
-# Compiled class file
+# Archivos compilados
 *.class
 
-# Log file
+# Archivos de log
 *.log
 
-# BlueJ files
+# Archivos temporales de BlueJ
 *.ctxt
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Archivos empaquetados
 *.jar
 *.war
 *.nar
@@ -19,9 +19,28 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Logs de fallos de la JVM
 hs_err_pid*
 replay_pid*
 
-# Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
+# Datos internos del plugin Kotlin en Gradle
 .kotlin/
+
+# Carpetas generadas por Gradle
+.gradle/
+build/
+
+# Archivos de configuración del IDE
+.idea/
+*.iml
+.vscode/
+
+# Variables de entorno sensibles
+.env
+
+# Tests si no quieres subirlos
+src/test/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
