@@ -53,6 +53,11 @@ dependencies {
     // Esto es para la parte de testing
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+
+
+    //implementacion del .env
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+
 }
 
 // Configuración del ShadowJar proporcionado por el plugin de Ktor
