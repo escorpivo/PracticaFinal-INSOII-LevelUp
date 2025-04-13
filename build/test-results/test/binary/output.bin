@@ -1,4 +1,0 @@
-®2025-03-05 17:34:10.532 [DefaultDispatcher-worker-1 @call-context#3] INFO  io.ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
-Å2025-03-05 17:34:10.562 [DefaultDispatcher-worker-1 @call-context#3] INFO  io.ktor.test - Application started in 0.041 seconds.
-z2025-03-05 17:34:10.565 [DefaultDispatcher-worker-2 @coroutine#4] INFO  io.ktor.test - Responding at http://localhost:80
-|2025-03-05 17:34:10.565 [DefaultDispatcher-worker-2 @coroutine#4] INFO  io.ktor.test - Responding at https://localhost:443

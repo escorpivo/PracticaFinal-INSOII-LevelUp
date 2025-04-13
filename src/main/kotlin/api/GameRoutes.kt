@@ -1,6 +1,6 @@
-package com.example.api
+package com.api
 
-import io.ktor.server.application.*
+import com.api.IGDBClient
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 

@@ -1,4 +1,4 @@
-package com.example.api
+package com.api
 
 import io.ktor.client.*
 import io.ktor.client.call.*
