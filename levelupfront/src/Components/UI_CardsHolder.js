@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Card  from "./components/Game_Card";
+import Card  from "./components/UI_Card";
 
 const CardsHolder = () => {
     const [games, setGames] = useState([]);

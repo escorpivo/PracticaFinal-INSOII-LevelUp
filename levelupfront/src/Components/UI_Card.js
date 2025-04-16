@@ -1,5 +1,5 @@
 import React from 'react';
-import "./card-style.css";
+import "./UI-Card-style.css";
 
 export const Card = ({nombre, descripcion, imagen}) => {
   return (
