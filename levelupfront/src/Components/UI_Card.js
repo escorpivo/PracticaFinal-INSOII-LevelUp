@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import "./UI-Card-style.css";
+import StarRating from "./StarRating";
 
-export const Card = ({ nombre, descripcion, imagen }) => {
+export const Card = ({ nombre, descripcion, imagen, rating }) => {
   const [flipped, setFlipped] = useState(false);
 
   const handleFlip = () => {
@@ -18,14 +19,17 @@ export const Card = ({ nombre, descripcion, imagen }) => {
           <div className='title'>
             <h5>{nombre}</h5>
           </div>
-          <div className='description'>
-            <p>{descripcion}</p>
+          <div className="rating">
+            <StarRating initialRating={Math.round(rating / 20)} size="5rem" />
           </div>
+          
         </>
       ) : (
         <div className="card-back-content">
           <h5>{nombre}</h5>
-          <p>Descripción breve del juego...</p>
+          <div className='description'>
+            <p>{descripcion}</p>
+          </div>
           <p>Más info aquí</p>
         </div>
       )}
