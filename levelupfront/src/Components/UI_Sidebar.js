@@ -8,7 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 const Sidebar = () => {
     return (
         <Box
-            width="60px"
+            width="100px"
             bgcolor="#f0f0f0"
             display="flex"
             flexDirection="column"
