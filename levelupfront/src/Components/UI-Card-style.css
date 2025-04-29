@@ -69,7 +69,11 @@
   }
   
   .card-back-content {
-    padding: 20px;
+    transform: rotateY(180deg);
+    font-size: 0.95rem;
+    color: #141313;
+    line-height: 1.4;
+    padding: 0 16px 16px 16px;
     text-align: center;
   }
   
