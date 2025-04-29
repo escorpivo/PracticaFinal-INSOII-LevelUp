@@ -52,3 +52,28 @@
     text-align: center;
   }
   
+  .card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    margin: 20px auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    cursor: pointer;
+  }
+  
+  .card.flipped {
+    transform: rotateY(180deg);
+  }
+  
+  .card-back-content {
+    transform: rotateY(180deg);
+    font-size: 0.95rem;
+    color: #141313;
+    line-height: 1.4;
+    padding: 0 16px 16px 16px;
+    text-align: center;
+  }
+  
