@@ -1,18 +1,20 @@
-package com
+ package com
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
-import io.ktor.server.response.*
+import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
-import io.ktor.util.*
+import java.io.File
 
 fun Application.configureRouting() {
+
+    //accedemos a la carpeta del frontend que contiene el resultado de npm run build
+    val buildDir = File("levelupfront/build")
+
     routing {
-        get("/") {
-            call.respondText("Hola, esto es la primera prueba de LevelUP!")
+        staticFiles("/", buildDir) {
+
+            //Accedemos a la página por defecto
+            default("index.html")
         }
     }
 }

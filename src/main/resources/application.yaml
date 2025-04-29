@@ -3,7 +3,7 @@ ktor:
     modules:
       - com.ApplicationKt.module
   deployment:
-    port: 5000
+    port: 8080
 jwt:
   domain: "https://jwt-provider-domain/"
   audience: "jwt-audience"
