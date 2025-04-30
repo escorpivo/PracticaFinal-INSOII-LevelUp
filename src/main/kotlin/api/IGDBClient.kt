@@ -16,7 +16,7 @@ import kotlinx.serialization.serializer
 class IGDBClient(private val clientId: String, private val clientSecret: String) {
     private val httpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json(Json { prettyPrint = true; isLenient = true})
+            json(Json { prettyPrint = true; isLenient = true })
         }
         install(HttpTimeout) {
             requestTimeoutMillis = 15000
@@ -39,36 +39,47 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         }
     }
 
-    // Obtener juegos desde IGDB haciendo petición al endpoint /games
+    // obtenemos los juegos desde IGDB haciendo petición al endpoint /games
     suspend fun fetchGames(): List<Game> {
-
-        //nos autorizamos para poder hacer peticiones, sino no será posible
         authorize()
 
-        val games: String = httpClient.post("https://api.igdb.com/v4/games") {
-            header("Client-ID", clientId)
-            header("Authorization", "Bearer $accessToken")
-            contentType(ContentType.Application.Json)
-            setBody("fields id, name, storyline, rating, url, cover; limit 20;")
-        }.body()
+        //aqui creo una lista mutable en la que se acumulan los juegos válidos
+        val finalGames = mutableListOf<Game>()
+        var offset = 0
 
-        println("Respuesta JSON de juegos: $games")
+        while (finalGames.size < 20) {
+            val gamesJson: String = httpClient.post("https://api.igdb.com/v4/games") {
+                header("Client-ID", clientId)
+                header("Authorization", "Bearer $accessToken")
+                contentType(ContentType.Application.Json)
+                setBody("fields id, name, storyline, rating, url, cover; where cover != null; sort rating desc; limit 20; offset $offset;")
+            }.body()
 
-        val gameList = Json.decodeFromString(ListSerializer(serializer<Game>()), games)
+            val gamesBatch = Json.decodeFromString(ListSerializer(serializer<Game>()), gamesJson)
+            val coverUrls = fetchCovers(gamesBatch.mapNotNull { it.cover })
 
-        // Obtener la URL de la portada a partir del cover ID
-        val coverUrls = fetchCovers(gameList.mapNotNull { it.cover })
+            val validGames = gamesBatch.mapNotNull { game ->
+                val url = coverUrls[game.cover]
+                if (url != null) game.copy(coverUrl = url) else null
+            }
 
-        // Asociar la URL de la portada con el juego correcto
-        return gameList.map { game ->
-            game.copy(coverUrl = coverUrls[game.cover] ?: "No hay portada disponible")
+            // Añadimos a la lista final solo los juegos con portada válida
+            finalGames += validGames
+
+            // Aumentamos el offset para obtener el siguiente bloque de resultados en la siguiente iteración
+            offset += 20
+
+            // para evitar bucle infinito si no hay más resultados
+            if (gamesBatch.isEmpty()) break
         }
+
+        //con esto devuelvo exactamente 20 juegos, por si me paso
+        return finalGames.take(20)
     }
 
-    //hacemos petición al endpoint /covers para buscar las imágenes que usaremos en las tarjetas de los juegos
-    suspend fun fetchCovers(coverIds: List<Int>): Map<Int, String> {
 
-        //controlamos el caso de que no haya covers en un juego
+    // Hacemos petición al endpoint /covers para buscar las imágenes que usaremos en las tarjetas de los juegos
+    suspend fun fetchCovers(coverIds: List<Int>): Map<Int, String> {
         if (coverIds.isEmpty()) return emptyMap()
 
         val covers: String = httpClient.post("https://api.igdb.com/v4/covers") {
@@ -80,27 +91,21 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
 
         println("Respuesta JSON de covers: $covers")
 
-        // Convertimos la respuesta en una lista de objetos Cover
         val coverList = Json.decodeFromString(ListSerializer(serializer<Cover>()), covers)
 
-        // Convertir la lista en un mapa de covers, donde se filtra la URL en base a la ID, además se añade https
-        //para que siempre estén bien formateadas las imágenes y la devolvemos
-        return coverList.associateBy({ it.id }, { "https:" + it.url })
+        return coverList.associateBy(
+            { it.id },
+            { "https:" + it.url.replace("/t_thumb/", "/t_cover_big/") }
+        )
     }
 
-
-    // Modelo de datos que se va a pasar al front
     @Serializable
     data class Game(
-
-        //datos que nos sirve la api /games
         val id: Int,
         val name: String,
         val storyline: String? = "IGDB no aporta storyline de este juego.",
         val rating: Double? = -0.1,
         val url: String? = "IGDB no ofrece una URL a este juego",
-
-        //parte de las cover a través del cover ID, encontramos una URL a la imagen, nos lo sirve /covers
         val cover: Int? = null,
         val coverUrl: String? = null
     )
@@ -110,6 +115,4 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         val id: Int,
         val url: String
     )
-
-
 }

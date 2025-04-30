@@ -15,9 +15,12 @@ import io.ktor.http.HttpMethod
 import io.ktor.server.plugins.cors.routing.*
 import com.configureRouting
 
-//cargamos el .env
-val dotenv = dotenv()
-
+// Cargamos el .env (si existe, solo en local), en producción se usará System.getenv()
+val dotenv = try {
+    dotenv()
+} catch (e: Exception) {
+    null
+}
 fun main() {
 
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
@@ -39,10 +42,11 @@ fun Application.module() {
         allowHeader(HttpHeaders.ContentType)
     }
 
-    //hay que crear un .env para evitar que los datos viajen por aqui
+    //se utiliza .env para hacer la consulta o, en caso de que no exista un .env, se llama a las variables de entorno definidas
+    //Como es el caso de render.
     val igdbClient = IGDBClient(
-        clientId = dotenv["CLIENT_ID"] ?: error("CLIENT_ID no encontrado"),
-        clientSecret = dotenv["CLIENT_SECRET"] ?: error("CLIENT_SECRET no encontrado")
+        clientId = dotenv?.get("CLIENT_ID") ?: System.getenv("CLIENT_ID") ?: error("CLIENT_ID no encontrado"),
+        clientSecret = dotenv?.get("CLIENT_SECRET") ?: System.getenv("CLIENT_SECRET") ?: error("CLIENT_SECRET no encontrado")
     )
 
     routing {
