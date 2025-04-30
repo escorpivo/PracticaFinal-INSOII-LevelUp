@@ -13,6 +13,7 @@ import io.github.cdimascio.dotenv.dotenv
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.server.plugins.cors.routing.*
+import com.configureRouting
 
 //cargamos el .env
 val dotenv = dotenv()
@@ -51,4 +52,6 @@ fun Application.module() {
             call.respond(games)
         }
     }
+
+    configureRouting()
 }
