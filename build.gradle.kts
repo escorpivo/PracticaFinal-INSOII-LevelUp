@@ -76,3 +76,13 @@ tasks {
 tasks.test {
     enabled = false
 }
+
+// Tarea para copiar el frontend compilado al directorio de recursos de Ktor
+tasks.register<Copy>("copyFrontend") {
+    from("../levelupfront/build") // Ajusta si está en otro lugar
+    into("build/resources/main/static")
+}
+
+tasks.named("processResources") {
+    dependsOn("copyFrontend")
+}

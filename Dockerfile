@@ -1,20 +1,37 @@
-# Imagen oficial de OpenJDK
+# ----------------------
+# Etapa 1: Compilar el frontend con Node.js
+# ----------------------
+FROM node:20-alpine as frontend-build
+
+WORKDIR /frontend
+
+# Copiamos package.json y lock para instalar solo si cambian
+COPY levelupfront/package*.json ./
+RUN npm install
+
+# copiamos todo el frontend y lo construimos
+COPY levelupfront/ .
+RUN npm run build
+
+# ----------------------
+# Etapa 2: Compilar el backend con Gradle y empaquetar frontend
+# ----------------------
 FROM openjdk:17-jdk-alpine
 
-# Establecemos el directorio de trabajo
 WORKDIR /app
 
-# Copiamos todos los archivos del proyecto al contenedor
+# Copiamos el backend completo
 COPY . .
 
-# Damos permisos de ejecución al script gradlew
-RUN chmod +x ./gradlew
+# Copiamos el frontend compilado desde la etapa anterior
+COPY --from=frontend-build /frontend/build ./levelupfront/build
 
-# Construimos el proyecto con Gradle
+# Damos permisos y construimos el JAR con el frontend incluido
+RUN chmod +x ./gradlew
 RUN ./gradlew build shadowJar
 
-# Exponemos el puerto 8080 para Render
+# Puerto expuesto por Ktor
 EXPOSE 8080
 
-# Ejecutamos la aplicación de Ktor con el nombre correcto del .jar
+# Ejecutamos la aplicación
 CMD ["java", "-jar", "build/libs/LevelUp-all.jar"]
