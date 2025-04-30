@@ -6,6 +6,8 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin: 20px auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 600px; 
+    max-height: 600px; 
   }
   
   .card:hover {
@@ -15,11 +17,11 @@
   
   .overflow {
     width: 100%;
-    aspect-ratio: 2 / 3; /* Esto mantiene la proporción 1440:2160 */
+    aspect-ratio: 2 / 3;
     overflow: hidden;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
-    background-color: #eee; /* opcional por si tarda en cargar la imagen */
+    background-color: #eee; 
   }
   
   .card-img {
@@ -46,6 +48,12 @@
     padding: 0 16px 16px 16px;
     color: #666;
     line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 20; /* número de líneas a mostrar */
+    -webkit-box-orient: vertical;
+    
   }
   
   .text-centered {
