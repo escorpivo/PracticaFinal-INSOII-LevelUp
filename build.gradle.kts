@@ -4,7 +4,7 @@ val ktor_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.10"
-    kotlin("plugin.serialization") version "2.1.10" // ✅ Añadido el plugin de serialización de Kotlin
+    kotlin("plugin.serialization") version "2.1.10"
     id("io.ktor.plugin") version "3.1.1"
 }
 
@@ -40,7 +40,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-xml:$ktor_version")
 
     // Esta es la librería de serialización directa de Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3") // ✅ Añadido para la serialización JSON
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     // Dependencias para obtener los datos de webs como IGDB
     implementation("io.ktor:ktor-client-core:$ktor_version")
@@ -60,6 +60,12 @@ dependencies {
     // Implementación de CORS
     implementation("io.ktor:ktor-server-cors:$ktor_version")
 
+    implementation("org.jetbrains.exposed:exposed-core:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-java-time:0.41.1")
+    implementation("org.postgresql:postgresql:42.5.4")
+    implementation("com.zaxxer:HikariCP:5.0.1")
 
 }
 
