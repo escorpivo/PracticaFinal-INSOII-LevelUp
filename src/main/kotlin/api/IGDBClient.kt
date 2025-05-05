@@ -53,7 +53,7 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
                 header("Client-ID", clientId)
                 header("Authorization", "Bearer $accessToken")
                 contentType(ContentType.Application.Json)
-                setBody("fields id, name, storyline, rating, url, cover, platforms; where cover != null; sort rating desc; limit 20; offset $offset;")
+                setBody("fields id, name, storyline, rating, url, cover, platforms, genres; where cover != null; sort rating desc; limit 20; offset $offset;")
             }.body()
 
             val gamesBatch = Json.decodeFromString(ListSerializer(serializer<Game>()), gamesJson)
@@ -62,12 +62,18 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
             val allPlatformIds = gamesBatch.flatMap { it.platforms ?: emptyList() }.distinct()
             val platformNames = fetchPlatforms(allPlatformIds)
 
+            val allGenreIds = gamesBatch.flatMap { it.genres ?: emptyList() }.distinct()
+            val genreNames = fetchGenres(allGenreIds)
+
             val validGames = gamesBatch.mapNotNull { game ->
                 val url = coverUrls[game.cover]
                 val platformNamesList = game.platforms?.mapNotNull { platformNames[it] } ?: listOf("Desconocida")
+                val genreNamesList = game.genres?.mapNotNull { genreNames[it] } ?: listOf("Sin género")
 
-                // Imprimir por consola todas las plataformas
-                println("Juego: ${game.name} - Plataformas: ${platformNamesList.joinToString(", ")}")
+                println("Juego: ${game.name}")
+                println(" → Plataformas: ${platformNamesList.joinToString(", ")}")
+                println(" → Géneros: ${genreNamesList.joinToString(", ")}")
+                println("")
 
                 val firstPlatformName = platformNamesList.firstOrNull() ?: "Desconocida"
                 if (url != null) game.copy(coverUrl = url, platform = firstPlatformName) else null
@@ -123,6 +129,27 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         return platformList.associateBy({ it.id }, { it.name })
     }
 
+    //aqui se obtiene el genero mediante los datos obtenidos
+    suspend fun fetchGenres(genreIds: List<Int>): Map<Int, String> {
+        if (genreIds.isEmpty()) return emptyMap()
+
+        val response: String = httpClient.post("https://api.igdb.com/v4/genres") {
+            header("Client-ID", clientId)
+            header("Authorization", "Bearer $accessToken")
+            contentType(ContentType.Application.Json)
+            setBody("fields id, name; where id = (${genreIds.joinToString(",")});")
+        }.body()
+
+        val genreList = Json.decodeFromString(ListSerializer(serializer<Genre>()), response)
+
+        genreList.forEach {
+            println("Género: ${it.id} - ${it.name}")
+        }
+
+        return genreList.associateBy({ it.id }, { it.name })
+    }
+
+
 
     @Serializable
     data class Game(
@@ -135,9 +162,13 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         val coverUrl: String? = null,
 
         val platforms: List<Int>? = null,
-        val platform: String = "Plataforma desconocida"
+        val platform: String = "Plataforma desconocida",
+
+        val genres: List<Int>? = null
     )
 
+
+    //data class para los diferentes datos obtenidos de los endpoints de IGDB
     @Serializable
     data class Cover(
         val id: Int,
@@ -149,4 +180,11 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         val id: Int,
         val name: String
     )
+
+    @Serializable
+    data class Genre(
+        val id: Int,
+        val name: String
+    )
+
 }
