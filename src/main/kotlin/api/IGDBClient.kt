@@ -8,6 +8,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -52,15 +53,24 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
                 header("Client-ID", clientId)
                 header("Authorization", "Bearer $accessToken")
                 contentType(ContentType.Application.Json)
-                setBody("fields id, name, storyline, rating, url, cover; where cover != null; sort rating desc; limit 20; offset $offset;")
+                setBody("fields id, name, storyline, rating, url, cover, platforms; where cover != null; sort rating desc; limit 20; offset $offset;")
             }.body()
 
             val gamesBatch = Json.decodeFromString(ListSerializer(serializer<Game>()), gamesJson)
             val coverUrls = fetchCovers(gamesBatch.mapNotNull { it.cover })
 
+            val allPlatformIds = gamesBatch.flatMap { it.platforms ?: emptyList() }.distinct()
+            val platformNames = fetchPlatforms(allPlatformIds)
+
             val validGames = gamesBatch.mapNotNull { game ->
                 val url = coverUrls[game.cover]
-                if (url != null) game.copy(coverUrl = url) else null
+                val platformNamesList = game.platforms?.mapNotNull { platformNames[it] } ?: listOf("Desconocida")
+
+                // Imprimir por consola todas las plataformas
+                println("Juego: ${game.name} - Plataformas: ${platformNamesList.joinToString(", ")}")
+
+                val firstPlatformName = platformNamesList.firstOrNull() ?: "Desconocida"
+                if (url != null) game.copy(coverUrl = url, platform = firstPlatformName) else null
             }
 
             // Añadimos a la lista final solo los juegos con portada válida
@@ -89,8 +99,6 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
             setBody("fields id, url; where id = (${coverIds.joinToString(",")});")
         }.body()
 
-        println("Respuesta JSON de covers: $covers")
-
         val coverList = Json.decodeFromString(ListSerializer(serializer<Cover>()), covers)
 
         return coverList.associateBy(
@@ -98,6 +106,23 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
             { "https:" + it.url.replace("/t_thumb/", "/t_cover_big/") }
         )
     }
+
+
+//aqui se busca la plataforma mediante los IDs obtenidos
+    suspend fun fetchPlatforms(platformIds: List<Int>): Map<Int, String> {
+        if (platformIds.isEmpty()) return emptyMap()
+
+        val response: String = httpClient.post("https://api.igdb.com/v4/platforms") {
+            header("Client-ID", clientId)
+            header("Authorization", "Bearer $accessToken")
+            contentType(ContentType.Application.Json)
+            setBody("fields id, name; where id = (${platformIds.joinToString(",")});")
+        }.body()
+
+        val platformList = Json.decodeFromString(ListSerializer(serializer<Platform>()), response)
+        return platformList.associateBy({ it.id }, { it.name })
+    }
+
 
     @Serializable
     data class Game(
@@ -107,12 +132,21 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         val rating: Double? = -0.1,
         val url: String? = "IGDB no ofrece una URL a este juego",
         val cover: Int? = null,
-        val coverUrl: String? = null
+        val coverUrl: String? = null,
+
+        val platforms: List<Int>? = null,
+        val platform: String = "Plataforma desconocida"
     )
 
     @Serializable
     data class Cover(
         val id: Int,
         val url: String
+    )
+
+    @Serializable
+    data class Platform(
+        val id: Int,
+        val name: String
     )
 }
