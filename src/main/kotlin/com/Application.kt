@@ -37,11 +37,11 @@ fun main() {
 
 fun Application.module() {
     // inicializa la BD:
-    DatabaseFactory.init(
+  /*  DatabaseFactory.init(
         url  = dotenv["DB_URL"]     ?: error("DB_URL no definido"),
         user = dotenv["DB_USER"]    ?: error("DB_USER no definido"),
         pass = dotenv["DB_PASSWORD"]?: error("DB_PASSWORD no definido")
-    )
+    )*/
 
     //instala un plugin en el servidor Ktor, permitiendo manejar distintos formatos de datos
     install(ContentNegotiation) {
@@ -49,7 +49,8 @@ fun Application.module() {
         json(Json { prettyPrint = true; isLenient = true; explicitNulls = true; encodeDefaults = true })
     }
     install(CORS) {
-        anyHost() // 🚨 Solo para desarrollo, no usar en producción
+        // Anyhost es Solo para desarrollo, no usar en producción, acarrea problemas de seguridad
+        anyHost()
         allowMethod(HttpMethod.Get)
         allowMethod(HttpMethod.Post)
         allowHeader(HttpHeaders.ContentType)
