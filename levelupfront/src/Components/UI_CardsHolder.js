@@ -18,7 +18,7 @@ const CardsHolder = ({ selectedGenre }) => {
   }, []);
 
   const filteredGames = selectedGenre
-    ? games.filter((game) => game.genres?.includes(selectedGenre))
+    ? games.filter((game) => game.genreNames?.includes(selectedGenre))
     : games;
 
   return (
