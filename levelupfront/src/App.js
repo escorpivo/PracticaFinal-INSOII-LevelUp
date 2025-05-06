@@ -10,6 +10,7 @@ import { Box, ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 function App() {
   const [activeView, setActiveView] = useState("cards");
   const [darkMode, setDarkMode] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState("");
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
@@ -25,11 +26,22 @@ function App() {
         <Box display="flex" flexDirection="column" height="100vh">
           <TopNav onChangeView={setActiveView} />
           <Box display="flex" flexGrow={1}>
-            <Sidebar />
+            <Sidebar
+              selectedGenre={selectedGenre}
+              onGenreChange={setSelectedGenre}
+            />
             <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
-              {activeView === "cards" && <CardsHolder darkMode={darkMode} />}
+              {activeView === "cards" && (
+                <CardsHolder
+                  darkMode={darkMode}
+                  selectedGenre={selectedGenre}
+                />
+              )}
               {activeView === "settings" && (
-                <SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />
+                <SettingsPage
+                  darkMode={darkMode}
+                  setDarkMode={setDarkMode}
+                />
               )}
             </Box>
           </Box>
