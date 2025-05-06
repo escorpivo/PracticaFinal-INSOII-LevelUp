@@ -84,8 +84,9 @@ fun Application.module() {
                 Ratings.insertIgnore {
                     it[Ratings.userId] = req.userId
                     it[Ratings.gameId] = req.gameId
-                    // Convertimos Short a Int para encajar con integer()
+                    //Convertimos Short a Int para encajar con integer()
                     it[Ratings.score]  = req.score.toInt()
+                    it[Ratings.gameName] = req.gameName  
                 }
             }
             call.respond(HttpStatusCode.Created)
