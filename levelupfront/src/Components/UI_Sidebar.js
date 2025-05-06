@@ -4,11 +4,16 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Typography,
+  Divider,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import DevicesIcon from "@mui/icons-material/Devices";
 import CategoryIcon from "@mui/icons-material/Category";
 import StarIcon from "@mui/icons-material/Star";
 import AddIcon from "@mui/icons-material/Add";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 const GENRE_LIST = [
   "Sin género",
@@ -26,44 +31,79 @@ const GENRE_LIST = [
   "Card & Board Game"
 ];
 
-const Sidebar = ({ selectedGenre, onGenreChange }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+const PLATFORM_LIST = [
+  "Desconocida",
+  "PC",
+  "PlayStation 4",
+  "PlayStation 5",
+  "Xbox One",
+  "Nintendo Switch",
+  "Linux",
+  "iOS",
+  "Android"
+];
 
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+const Sidebar = ({
+  selectedGenre,
+  onGenreChange,
+  selectedPlatform,
+  onPlatformChange
+}) => {
+  const [genreAnchorEl, setGenreAnchorEl] = useState(null);
+  const [platformAnchorEl, setPlatformAnchorEl] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
+  const openGenreMenu = Boolean(genreAnchorEl);
+  const openPlatformMenu = Boolean(platformAnchorEl);
 
+  const handleOpenGenreMenu = (event) => setGenreAnchorEl(event.currentTarget);
+  const handleCloseGenreMenu = () => setGenreAnchorEl(null);
   const handleSelectGenre = (genre) => {
     onGenreChange(genre);
-    handleCloseMenu();
+    handleCloseGenreMenu();
+  };
+
+  const handleOpenPlatformMenu = (event) => setPlatformAnchorEl(event.currentTarget);
+  const handleClosePlatformMenu = () => setPlatformAnchorEl(null);
+  const handleSelectPlatform = (platform) => {
+    onPlatformChange(platform);
+    handleClosePlatformMenu();
   };
 
   return (
     <Box
-      width="100px"
       sx={{
+        width: isExpanded ? 240 : 100,
         bgcolor: (theme) => theme.palette.background.default,
         color: (theme) => theme.palette.text.primary,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        paddingTop: 1,
+        alignItems: isExpanded ? "flex-start" : "center",
+        paddingY: 2,
+        paddingX: isExpanded ? 2 : 0,
         borderRight: (theme) => `1px solid ${theme.palette.divider}`,
         gap: 1,
+        transition: "width 0.3s ease",
       }}
     >
-      <IconButton onClick={handleOpenMenu} title="Filtrar por género">
-        <FilterListIcon />
-      </IconButton>
+      {/* Botón expandir/colapsar */}
+      <Box width="100%" display="flex" justifyContent={isExpanded ? "flex-end" : "center"}>
+        <IconButton onClick={() => setIsExpanded((prev) => !prev)}>
+          {isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        </IconButton>
+      </Box>
+
+      {/* Filtro por género */}
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton onClick={handleOpenGenreMenu} title="Filtrar por género">
+          <FilterListIcon />
+        </IconButton>
+        {isExpanded && <Typography variant="body2">Género</Typography>}
+      </Box>
       <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleCloseMenu}
+        anchorEl={genreAnchorEl}
+        open={openGenreMenu}
+        onClose={handleCloseGenreMenu}
       >
         <MenuItem
           selected={selectedGenre === ""}
@@ -82,9 +122,50 @@ const Sidebar = ({ selectedGenre, onGenreChange }) => {
         ))}
       </Menu>
 
-      <IconButton><CategoryIcon /></IconButton>
-      <IconButton><StarIcon /></IconButton>
-      <IconButton><AddIcon /></IconButton>
+      {/* Filtro por plataforma */}
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton onClick={handleOpenPlatformMenu} title="Filtrar por plataforma">
+          <DevicesIcon />
+        </IconButton>
+        {isExpanded && <Typography variant="body2">Plataforma</Typography>}
+      </Box>
+      <Menu
+        anchorEl={platformAnchorEl}
+        open={openPlatformMenu}
+        onClose={handleClosePlatformMenu}
+      >
+        <MenuItem
+          selected={selectedPlatform === ""}
+          onClick={() => handleSelectPlatform("")}
+        >
+          Todas
+        </MenuItem>
+        {PLATFORM_LIST.map((platform) => (
+          <MenuItem
+            key={platform}
+            selected={selectedPlatform === platform}
+            onClick={() => handleSelectPlatform(platform)}
+          >
+            {platform}
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <Divider sx={{ width: "100%", my: 1 }} />
+
+      {/* Otros iconos decorativos */}
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton><CategoryIcon /></IconButton>
+        {isExpanded && <Typography variant="body2">Categoría</Typography>}
+      </Box>
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton><StarIcon /></IconButton>
+        {isExpanded && <Typography variant="body2">Favoritos</Typography>}
+      </Box>
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton><AddIcon /></IconButton>
+        {isExpanded && <Typography variant="body2">Añadir</Typography>}
+      </Box>
     </Box>
   );
 };

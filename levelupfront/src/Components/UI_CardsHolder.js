@@ -3,7 +3,7 @@ import axios from "axios";
 import { Box, Grid } from "@mui/material";
 import Card from "./UI_Card";
 
-const CardsHolder = ({ selectedGenre }) => {
+const CardsHolder = ({ selectedGenre, selectedPlatform }) => {
   const [games, setGames] = useState([]);
 
   useEffect(() => {
@@ -17,9 +17,15 @@ const CardsHolder = ({ selectedGenre }) => {
       });
   }, []);
 
-  const filteredGames = selectedGenre
-    ? games.filter((game) => game.genreNames?.includes(selectedGenre))
-    : games;
+  const filteredGames = games.filter((game) => {
+    const matchesGenre = selectedGenre
+      ? game.genreNames?.includes(selectedGenre)
+      : true;
+    const matchesPlatform = selectedPlatform
+      ? game.platformNames?.includes(selectedPlatform)
+      : true;
+    return matchesGenre && matchesPlatform;
+  });
 
   return (
     <Box p={2} sx={{ flexGrow: 1, width: "100%" }}>
