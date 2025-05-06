@@ -10,6 +10,22 @@ import CategoryIcon from "@mui/icons-material/Category";
 import StarIcon from "@mui/icons-material/Star";
 import AddIcon from "@mui/icons-material/Add";
 
+const GENRE_LIST = [
+  "Sin género",
+  "Action",
+  "Adventure",
+  "RPG",
+  "Shooter",
+  "Strategy",
+  "Platform",
+  "Indie",
+  "Puzzle",
+  "Visual Novel",
+  "Fighting",
+  "Simulator",
+  "Card & Board Game"
+];
+
 const Sidebar = ({ selectedGenre, onGenreChange }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -41,7 +57,7 @@ const Sidebar = ({ selectedGenre, onGenreChange }) => {
         gap: 1,
       }}
     >
-      <IconButton onClick={handleOpenMenu}>
+      <IconButton onClick={handleOpenMenu} title="Filtrar por género">
         <FilterListIcon />
       </IconButton>
       <Menu
@@ -55,36 +71,15 @@ const Sidebar = ({ selectedGenre, onGenreChange }) => {
         >
           Todos
         </MenuItem>
-        <MenuItem
-          selected={selectedGenre === "Action"}
-          onClick={() => handleSelectGenre("Action")}
-        >
-          Acción
-        </MenuItem>
-        <MenuItem
-          selected={selectedGenre === "Adventure"}
-          onClick={() => handleSelectGenre("Adventure")}
-        >
-          Aventura
-        </MenuItem>
-        <MenuItem
-          selected={selectedGenre === "RPG"}
-          onClick={() => handleSelectGenre("RPG")}
-        >
-          RPG
-        </MenuItem>
-        <MenuItem
-          selected={selectedGenre === "Strategy"}
-          onClick={() => handleSelectGenre("Strategy")}
-        >
-          Estrategia
-        </MenuItem>
-        <MenuItem
-          selected={selectedGenre === "Shooter"}
-          onClick={() => handleSelectGenre("Shooter")}
-        >
-          Shooter
-        </MenuItem>
+        {GENRE_LIST.map((genre) => (
+          <MenuItem
+            key={genre}
+            selected={selectedGenre === genre}
+            onClick={() => handleSelectGenre(genre)}
+          >
+            {genre}
+          </MenuItem>
+        ))}
       </Menu>
 
       <IconButton><CategoryIcon /></IconButton>
