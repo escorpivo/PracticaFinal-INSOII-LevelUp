@@ -4,12 +4,16 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Typography,
+  Divider,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import DevicesIcon from "@mui/icons-material/Devices";
 import CategoryIcon from "@mui/icons-material/Category";
 import StarIcon from "@mui/icons-material/Star";
 import AddIcon from "@mui/icons-material/Add";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 const GENRE_LIST = [
   "Sin género",
@@ -47,6 +51,7 @@ const Sidebar = ({
 }) => {
   const [genreAnchorEl, setGenreAnchorEl] = useState(null);
   const [platformAnchorEl, setPlatformAnchorEl] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const openGenreMenu = Boolean(genreAnchorEl);
   const openPlatformMenu = Boolean(platformAnchorEl);
@@ -67,22 +72,34 @@ const Sidebar = ({
 
   return (
     <Box
-      width="100px"
       sx={{
+        width: isExpanded ? 240 : 100,
         bgcolor: (theme) => theme.palette.background.default,
         color: (theme) => theme.palette.text.primary,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        paddingTop: 1,
+        alignItems: isExpanded ? "flex-start" : "center",
+        paddingY: 2,
+        paddingX: isExpanded ? 2 : 0,
         borderRight: (theme) => `1px solid ${theme.palette.divider}`,
         gap: 1,
+        transition: "width 0.3s ease",
       }}
     >
+      {/* Botón expandir/colapsar */}
+      <Box width="100%" display="flex" justifyContent={isExpanded ? "flex-end" : "center"}>
+        <IconButton onClick={() => setIsExpanded((prev) => !prev)}>
+          {isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        </IconButton>
+      </Box>
+
       {/* Filtro por género */}
-      <IconButton onClick={handleOpenGenreMenu} title="Filtrar por género">
-        <FilterListIcon />
-      </IconButton>
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton onClick={handleOpenGenreMenu} title="Filtrar por género">
+          <FilterListIcon />
+        </IconButton>
+        {isExpanded && <Typography variant="body2">Género</Typography>}
+      </Box>
       <Menu
         anchorEl={genreAnchorEl}
         open={openGenreMenu}
@@ -106,9 +123,12 @@ const Sidebar = ({
       </Menu>
 
       {/* Filtro por plataforma */}
-      <IconButton onClick={handleOpenPlatformMenu} title="Filtrar por plataforma">
-        <DevicesIcon />
-      </IconButton>
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton onClick={handleOpenPlatformMenu} title="Filtrar por plataforma">
+          <DevicesIcon />
+        </IconButton>
+        {isExpanded && <Typography variant="body2">Plataforma</Typography>}
+      </Box>
       <Menu
         anchorEl={platformAnchorEl}
         open={openPlatformMenu}
@@ -131,10 +151,21 @@ const Sidebar = ({
         ))}
       </Menu>
 
+      <Divider sx={{ width: "100%", my: 1 }} />
+
       {/* Otros iconos decorativos */}
-      <IconButton><CategoryIcon /></IconButton>
-      <IconButton><StarIcon /></IconButton>
-      <IconButton><AddIcon /></IconButton>
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton><CategoryIcon /></IconButton>
+        {isExpanded && <Typography variant="body2">Categoría</Typography>}
+      </Box>
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton><StarIcon /></IconButton>
+        {isExpanded && <Typography variant="body2">Favoritos</Typography>}
+      </Box>
+      <Box width="100%" display="flex" alignItems="center" gap={1}>
+        <IconButton><AddIcon /></IconButton>
+        {isExpanded && <Typography variant="body2">Añadir</Typography>}
+      </Box>
     </Box>
   );
 };
