@@ -86,3 +86,22 @@
   padding: 0 16px 16px 16px;
   text-align: center;
 }
+
+/* 🌙 Estilos para modo oscuro */
+body.dark .card {
+  background-color: #1e1e1e;
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.05);
+}
+
+body.dark .title {
+  color: #f0f0f0;
+}
+
+body.dark .description {
+  color: #c0c0c0;
+}
+
+body.dark .card-back-content {
+  color: #f0f0f0;
+  background-color: #1e1e1e;
+}
