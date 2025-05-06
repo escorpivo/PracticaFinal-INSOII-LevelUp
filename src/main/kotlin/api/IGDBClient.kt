@@ -48,12 +48,12 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         val finalGames = mutableListOf<Game>()
         var offset = 0
 
-        while (finalGames.size < 20) {
+        while (finalGames.size < 24) {
             val gamesJson: String = httpClient.post("https://api.igdb.com/v4/games") {
                 header("Client-ID", clientId)
                 header("Authorization", "Bearer $accessToken")
                 contentType(ContentType.Application.Json)
-                setBody("fields id, name, storyline, rating, url, cover, platforms, genres; where cover != null; sort rating desc; limit 20; offset $offset;")
+                setBody("fields id, name, storyline, rating, url, cover, platforms, genres; where cover != null; sort rating desc; limit 24; offset $offset;")
             }.body()
 
             val gamesBatch = Json.decodeFromString(ListSerializer(serializer<Game>()), gamesJson)
@@ -83,14 +83,14 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
             finalGames += validGames
 
             // Aumentamos el offset para obtener el siguiente bloque de resultados en la siguiente iteración
-            offset += 20
+            offset += 24
 
             // para evitar bucle infinito si no hay más resultados
             if (gamesBatch.isEmpty()) break
         }
 
         //con esto devuelvo exactamente 20 juegos, por si me paso
-        return finalGames.take(20)
+        return finalGames.take(24)
     }
 
 
