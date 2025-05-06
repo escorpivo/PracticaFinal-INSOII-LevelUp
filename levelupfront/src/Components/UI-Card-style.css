@@ -1,79 +1,88 @@
 .card {
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin: 20px auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  .card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
-  }
-  
-  .overflow {
-    width: 100%;
-    aspect-ratio: 2 / 3; /* Esto mantiene la proporción 1440:2160 */
-    overflow: hidden;
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
-    background-color: #eee; /* opcional por si tarda en cargar la imagen */
-  }
-  
-  .card-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s ease;
-  }
-  
-  .card:hover .card-img {
-    transform: scale(1.05);
-  }
-  
-  .title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    padding: 12px 16px 0 16px;
-    color: #333;
-  }
-  
-  .description {
-    font-size: 0.95rem;
-    padding: 0 16px 16px 16px;
-    color: #666;
-    line-height: 1.4;
-  }
-  
-  .text-centered {
-    text-align: center;
-  }
-  
-  .card {
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-    margin: 20px auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    cursor: pointer;
-  }
-  
-  .card.flipped {
-    transform: rotateY(180deg);
-  }
-  
-  .card-back-content {
-    transform: rotateY(180deg);
-    font-size: 0.95rem;
-    color: #141313;
-    line-height: 1.4;
-    padding: 0 16px 16px 16px;
-    text-align: center;
-  }
-  
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 20px auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 600px; 
+  max-height: 600px; 
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+.overflow {
+  width: 100%;
+  aspect-ratio: 2 / 3; /* Esto mantiene la proporción 1440:2160 */
+  overflow: hidden;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  background-color: #eee; /* opcional por si tarda en cargar la imagen */
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+  padding: 0 16px 16px 16px;
+  color: #666;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 20; /* número de líneas a mostrar */
+  -webkit-box-orient: vertical;
+}
+
+.card:hover .card-img {
+  transform: scale(1.05);
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 12px 16px 0 16px;
+  color: #333;
+}
+
+.description {
+  font-size: 0.95rem;
+  padding: 0 16px 16px 16px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.text-centered {
+  text-align: center;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  margin: 20px auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  cursor: pointer;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-back-content {
+  transform: rotateY(180deg);
+  font-size: 0.95rem;
+  color: #141313;
+  line-height: 1.4;
+  padding: 0 16px 16px 16px;
+  text-align: center;
+}
