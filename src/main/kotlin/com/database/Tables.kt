@@ -31,7 +31,8 @@ object Ratings : Table("ratings") {
 
     // Usamos integer en lugar de smallint
     val score   = integer("score").check { it.between(1, 5) }
-    val ratedAt = datetime("rated_at").defaultExpression(CurrentDateTime)
+
+    val gameName = text("gameName")
 
     init {
         uniqueIndex("UX_Ratings_User_Game", userId, gameId)
