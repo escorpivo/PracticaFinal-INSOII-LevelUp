@@ -11,6 +11,7 @@ function App() {
   const [activeView, setActiveView] = useState("cards");
   const [darkMode, setDarkMode] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedPlatform, setSelectedPlatform] = useState("");
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
@@ -29,12 +30,15 @@ function App() {
             <Sidebar
               selectedGenre={selectedGenre}
               onGenreChange={setSelectedGenre}
+              selectedPlatform={selectedPlatform}
+              onPlatformChange={setSelectedPlatform}
             />
             <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
               {activeView === "cards" && (
                 <CardsHolder
                   darkMode={darkMode}
                   selectedGenre={selectedGenre}
+                  selectedPlatform={selectedPlatform}
                 />
               )}
               {activeView === "settings" && (

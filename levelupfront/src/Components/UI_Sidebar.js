@@ -6,6 +6,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import DevicesIcon from "@mui/icons-material/Devices";
 import CategoryIcon from "@mui/icons-material/Category";
 import StarIcon from "@mui/icons-material/Star";
 import AddIcon from "@mui/icons-material/Add";
@@ -26,21 +27,42 @@ const GENRE_LIST = [
   "Card & Board Game"
 ];
 
-const Sidebar = ({ selectedGenre, onGenreChange }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+const PLATFORM_LIST = [
+  "Desconocida",
+  "PC",
+  "PlayStation 4",
+  "PlayStation 5",
+  "Xbox One",
+  "Nintendo Switch",
+  "Linux",
+  "iOS",
+  "Android"
+];
 
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+const Sidebar = ({
+  selectedGenre,
+  onGenreChange,
+  selectedPlatform,
+  onPlatformChange
+}) => {
+  const [genreAnchorEl, setGenreAnchorEl] = useState(null);
+  const [platformAnchorEl, setPlatformAnchorEl] = useState(null);
 
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
+  const openGenreMenu = Boolean(genreAnchorEl);
+  const openPlatformMenu = Boolean(platformAnchorEl);
 
+  const handleOpenGenreMenu = (event) => setGenreAnchorEl(event.currentTarget);
+  const handleCloseGenreMenu = () => setGenreAnchorEl(null);
   const handleSelectGenre = (genre) => {
     onGenreChange(genre);
-    handleCloseMenu();
+    handleCloseGenreMenu();
+  };
+
+  const handleOpenPlatformMenu = (event) => setPlatformAnchorEl(event.currentTarget);
+  const handleClosePlatformMenu = () => setPlatformAnchorEl(null);
+  const handleSelectPlatform = (platform) => {
+    onPlatformChange(platform);
+    handleClosePlatformMenu();
   };
 
   return (
@@ -57,13 +79,14 @@ const Sidebar = ({ selectedGenre, onGenreChange }) => {
         gap: 1,
       }}
     >
-      <IconButton onClick={handleOpenMenu} title="Filtrar por género">
+      {/* Filtro por género */}
+      <IconButton onClick={handleOpenGenreMenu} title="Filtrar por género">
         <FilterListIcon />
       </IconButton>
       <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleCloseMenu}
+        anchorEl={genreAnchorEl}
+        open={openGenreMenu}
+        onClose={handleCloseGenreMenu}
       >
         <MenuItem
           selected={selectedGenre === ""}
@@ -82,6 +105,33 @@ const Sidebar = ({ selectedGenre, onGenreChange }) => {
         ))}
       </Menu>
 
+      {/* Filtro por plataforma */}
+      <IconButton onClick={handleOpenPlatformMenu} title="Filtrar por plataforma">
+        <DevicesIcon />
+      </IconButton>
+      <Menu
+        anchorEl={platformAnchorEl}
+        open={openPlatformMenu}
+        onClose={handleClosePlatformMenu}
+      >
+        <MenuItem
+          selected={selectedPlatform === ""}
+          onClick={() => handleSelectPlatform("")}
+        >
+          Todas
+        </MenuItem>
+        {PLATFORM_LIST.map((platform) => (
+          <MenuItem
+            key={platform}
+            selected={selectedPlatform === platform}
+            onClick={() => handleSelectPlatform(platform)}
+          >
+            {platform}
+          </MenuItem>
+        ))}
+      </Menu>
+
+      {/* Otros iconos decorativos */}
       <IconButton><CategoryIcon /></IconButton>
       <IconButton><StarIcon /></IconButton>
       <IconButton><AddIcon /></IconButton>
