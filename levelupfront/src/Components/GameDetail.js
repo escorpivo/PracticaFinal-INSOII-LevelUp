@@ -8,6 +8,16 @@ const GameDetail = ({ game }) => {
 
   if (!game) return <Typography>Juego no encontrado</Typography>;
 
+  // Colores personalizados por plataforma
+  const getPlatformColor = (platformName) => {
+    const name = platformName.toLowerCase();
+    if (name.includes("playstation")) return "#003087";      // Azul
+    if (name.includes("xbox")) return "#107C10";              // Verde
+    if (name.includes("nintendo")) return "#e60012";          // Rojo
+    if (name.includes("windows") || name.includes("pc")) return "#666"; // Gris
+    return "#444"; // Color por defecto
+  };
+
   return (
     <Box p={4}>
       {/* Título centrado y botón a la derecha */}
@@ -56,12 +66,42 @@ const GameDetail = ({ game }) => {
       </Box>
 
       {/* Plataformas */}
-      <Box sx={{ ml: { md: "20%" } }}>
+      <Box sx={{ ml: { md: "20%" }, mb: 2 }}>
         <Typography variant="h6">Plataformas:</Typography>
         {game.platformNames?.map((p, i) => (
-          <Chip key={i} label={p} sx={{ mr: 1, mt: 1 }} />
+          <Chip
+            key={i}
+            label={p}
+            sx={{
+              mr: 1,
+              mt: 1,
+              backgroundColor: getPlatformColor(p),
+              color: "#fff",
+              fontWeight: "bold"
+            }}
+          />
         ))}
       </Box>
+
+      {/* Géneros */}
+      {game.genreNames?.length > 0 && (
+        <Box sx={{ ml: { md: "20%" } }}>
+          <Typography variant="h6">Géneros:</Typography>
+          {game.genreNames.map((g, i) => (
+            <Chip
+              key={i}
+              label={g}
+              sx={{
+                mr: 1,
+                mt: 1,
+                backgroundColor: "#555",
+                color: "#fff",
+                fontWeight: "bold"
+              }}
+            />
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };
