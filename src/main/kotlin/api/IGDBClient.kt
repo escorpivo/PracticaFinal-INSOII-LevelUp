@@ -14,6 +14,11 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 
+//peticiones simultaneas
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+
 class IGDBClient(private val clientId: String, private val clientSecret: String) {
 
     private val json = Json {
@@ -51,53 +56,59 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
     suspend fun fetchGames(): List<Game> {
         authorize()
 
-        //aqui creo una lista mutable en la que se acumulan los juegos válidos
         val finalGames = mutableListOf<Game>()
         var offset = 0
+        val requestLimit = 10
 
         while (finalGames.size < 24) {
             val gamesJson: String = httpClient.post("https://api.igdb.com/v4/games") {
                 header("Client-ID", clientId)
                 header("Authorization", "Bearer $accessToken")
                 contentType(ContentType.Application.Json)
-                setBody("fields id, name, storyline, rating, url, cover, platforms, genres; where cover != null; sort rating desc; limit 24; offset $offset;")
+                setBody("fields id, name, storyline, rating, url, cover, platforms, genres; where cover != null; sort rating desc; limit $requestLimit; offset $offset;")
             }.body()
 
             val gamesBatch = json.decodeFromString(ListSerializer(serializer<Game>()), gamesJson)
 
-            val coverUrls = fetchCovers(gamesBatch.mapNotNull { it.cover })
+            if (gamesBatch.isEmpty()) break // Fin de datos
 
-            val allPlatformIds = gamesBatch.flatMap { it.platforms ?: emptyList() }.distinct()
-            val platformNames = fetchPlatforms(allPlatformIds)
+            val coverIds = gamesBatch.mapNotNull { it.cover }
+            val platformIds = gamesBatch.flatMap { it.platforms ?: emptyList() }.distinct()
+            val genreIds = gamesBatch.flatMap { it.genres ?: emptyList() }.distinct()
 
-            val allGenreIds = gamesBatch.flatMap { it.genres ?: emptyList() }.distinct()
-            val genreNames = fetchGenres(allGenreIds)
+            val (coverUrls, platformNames, genreNames) = coroutineScope {
+                val coverDeferred = if (coverIds.isNotEmpty()) async { fetchCovers(coverIds) } else async { emptyMap() }
+                val platformDeferred = if (platformIds.isNotEmpty()) async { fetchPlatforms(platformIds) } else async { emptyMap() }
+                val genreDeferred = if (genreIds.isNotEmpty()) async { fetchGenres(genreIds) } else async { emptyMap() }
+                awaitAll(coverDeferred, platformDeferred, genreDeferred)
+            }
 
             val validGames = gamesBatch.mapNotNull { game ->
                 val url = coverUrls[game.cover]
-                val platformNamesList = game.platforms?.mapNotNull { platformNames[it] } ?: listOf("Desconocida")
-                val genreNamesList = game.genres?.mapNotNull { genreNames[it] } ?: listOf("Sin género")
+                if (url != null) {
+                    val platformNamesList = game.platforms?.mapNotNull { platformNames[it] } ?: listOf("Desconocida")
+                    val genreNamesList = game.genres?.mapNotNull { genreNames[it] } ?: listOf("Sin género")
 
-                val firstPlatformName = platformNamesList.firstOrNull() ?: "Desconocida"
-                if (url != null) game.copy(
-                    coverUrl = url,
-                    platform = firstPlatformName,
-                    platformNames = platformNamesList,
-                    genreNames = genreNamesList
-                ) else null
+                    game.copy(
+                        coverUrl = url,
+                        platform = platformNamesList.firstOrNull() ?: "Desconocida",
+                        platformNames = platformNamesList,
+                        genreNames = genreNamesList
+                    )
+                } else null
             }
 
-            // Añadimos a la lista final solo los juegos con portada válida
-            finalGames += validGames
+            for (game in validGames) {
+                if (finalGames.size >= 24) break
+                finalGames += game
+            }
 
-            // Aumentamos el offset para obtener el siguiente bloque de resultados en la siguiente iteración
-            offset += 24
 
-            // para evitar bucle infinito si no hay más resultados
-            if (gamesBatch.isEmpty()) break
+            println("Offset procesado: $offset | Juegos válidos acumulados: ${finalGames.size}")
+            offset += gamesBatch.size
+
         }
 
-        //con esto devuelvo exactamente 20 juegos, por si me paso
         return finalGames.take(24)
     }
 
@@ -190,5 +201,4 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         val id: Int,
         val name: String
     )
-
 }
