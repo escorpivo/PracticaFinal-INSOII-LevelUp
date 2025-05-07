@@ -24,7 +24,11 @@ function MainLayout(props) {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      <TopNav onChangeView={setActiveView} />
+      <TopNav
+        onChangeView={setActiveView}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
       <Box display="flex" flexGrow={1}>
         <Sidebar
           selectedGenre={selectedGenre}
@@ -39,6 +43,7 @@ function MainLayout(props) {
     </Box>
   );
 }
+
 
 function App() {
   const [activeView, setActiveView] = useState("cards");
@@ -107,10 +112,15 @@ function App() {
                 selectedPlatform={selectedPlatform}
                 setSelectedPlatform={setSelectedPlatform}
               >
-                <GameDetailWrapper />
+                {activeView === "settings" ? (
+                  <SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />
+                ) : (
+                  <GameDetailWrapper />
+                )}
               </MainLayout>
             }
           />
+
         </Routes>
       </ThemeProvider>
     </Router>

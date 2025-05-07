@@ -1,8 +1,11 @@
 import React from "react";
 import { AppBar, Toolbar, Button, Box } from "@mui/material";
 import SearchBar from "./UI_Searchbar";
+import { useNavigate } from "react-router-dom";
 
 const TopNav = ({ onChangeView }) => {
+    const navigate = useNavigate();
+
     return (
         <AppBar position="static" color="default" elevation={1}>
             <Toolbar
@@ -24,7 +27,14 @@ const TopNav = ({ onChangeView }) => {
                         gap: 3,
                     }}
                 >
-                    <Button color="inherit" sx={{ fontWeight: "bold" }} onClick={() => onChangeView("cards")}>
+                    <Button
+                        color="inherit"
+                        sx={{ fontWeight: "bold" }}
+                        onClick={() => {
+                            onChangeView("cards");
+                            navigate("/");
+                        }}
+                    >
                         Inicio
                     </Button>
                     <Button color="inherit" sx={{ fontWeight: "bold" }}>
@@ -33,7 +43,11 @@ const TopNav = ({ onChangeView }) => {
                     <Button color="inherit" sx={{ fontWeight: "bold" }}>
                         Estadísticas
                     </Button>
-                    <Button color="inherit" sx={{ fontWeight: "bold" }} onClick={() => onChangeView("settings")}>
+                    <Button
+                        color="inherit"
+                        sx={{ fontWeight: "bold" }}
+                        onClick={() => onChangeView("settings")}
+                    >
                         Ajustes
                     </Button>
                 </Box>
