@@ -33,6 +33,7 @@ const CardsHolder = ({ selectedGenre, selectedPlatform }) => {
         {filteredGames.map((game, index) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
             <Card
+              id={game.id}
               nombre={game.name}
               descripcion={game.storyline ?? "No disponible"}
               imagen={game.coverUrl}

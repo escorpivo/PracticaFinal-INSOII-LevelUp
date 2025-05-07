@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import "./UI-Card-style.css";
 import StarRating from "./StarRating";
 
-export const Card = ({ nombre, descripcion, imagen, rating }) => {
+export const Card = ({ id, nombre, descripcion, imagen, rating }) => {
   const [flipped, setFlipped] = useState(false);
 
   const handleFlip = () => {
@@ -30,7 +30,20 @@ export const Card = ({ nombre, descripcion, imagen, rating }) => {
           <div className='description'>
             <p>{descripcion}</p>
           </div>
-          <p>Más info aquí</p>
+
+          
+          <p
+            onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = `/game/${id}`;
+            }}
+            style={{ cursor: "pointer", color: "#007bff", textDecoration: "underline" }}
+          >
+            Más info aquí
+          </p>
+
+
+
         </div>
       )}
     </div>
