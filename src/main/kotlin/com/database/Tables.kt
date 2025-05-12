@@ -55,6 +55,7 @@ object Comments : Table("comments") {
 object Users : Table("users") {
   val id       = integer("id").autoIncrement()
   override val primaryKey = PrimaryKey(id, name = "PK_Users_Id")
+  val username  = varchar("username", length = 50).uniqueIndex()
   val email    = varchar("email", length = 255).uniqueIndex()
   val password = varchar("password", length = 60) // BCrypt
   val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)
