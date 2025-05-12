@@ -51,3 +51,11 @@ object Comments : Table("comments") {
     val content     = text("content")
     val commentedAt = datetime("commented_at").defaultExpression(CurrentDateTime)
 }
+
+object Users : Table("users") {
+  val id       = integer("id").autoIncrement()
+  override val primaryKey = PrimaryKey(id, name = "PK_Users_Id")
+  val email    = varchar("email", length = 255).uniqueIndex()
+  val password = varchar("password", length = 60) // BCrypt
+  val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)
+}
