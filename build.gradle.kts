@@ -67,6 +67,10 @@ dependencies {
     implementation("org.postgresql:postgresql:42.5.4")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
+    implementation("at.favre.lib:bcrypt:0.9.0")
+    implementation("io.ktor:ktor-server-auth-jwt:2.x.x")
+    implementation("com.auth0:java-jwt:4.x.x")
+
 }
 
 // Configuración del ShadowJar proporcionado por el plugin de Ktor

@@ -10,7 +10,7 @@ object Users : Table("users") {
     override val primaryKey = PrimaryKey(id, name = "PK_Users_Id")
     val username     = varchar("username", 50).uniqueIndex()
     val email        = varchar("email", 100).uniqueIndex()
-    val passwordHash = text("password_hash")
+    val password = varchar("password", length = 60) // BCrypt
     val createdAt    = datetime("created_at").defaultExpression(CurrentDateTime)
 }
 
