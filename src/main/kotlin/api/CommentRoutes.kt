@@ -1,19 +1,17 @@
 package api
 
-import api.CommentRequest
-import api.CommentResponse
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import com.database.Comments
 import com.database.Games
 import com.database.Users
 import io.ktor.http.*
+import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertIgnore
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.format.DateTimeFormatter
 
@@ -61,6 +59,46 @@ fun Route.commentRoutes() {
                 }
 
                 call.respond(HttpStatusCode.Created)
+            }
+
+
+            // PUT /api/comments/{id}
+            put("/{id}") {
+                val principal = call.principal<JWTPrincipal>() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+                val userId = principal.payload.getClaim("userId").asInt()
+                val commentId = call.parameters["id"]?.toIntOrNull() ?: return@put call.respond(HttpStatusCode.BadRequest, "ID inválido")
+                val req = call.receive<CommentRequest>()
+
+                val updatedRows = transaction {
+                    Comments.update({ Comments.id eq commentId and (Comments.userId eq userId) }) {
+                        it[content] = req.content
+                    }
+                }
+
+                if (updatedRows > 0) {
+                    call.respond(HttpStatusCode.OK, "Comentario actualizado")
+                } else {
+                    call.respond(HttpStatusCode.Forbidden, "No tienes permiso para editar este comentario o no existe")
+                }
+            }
+
+
+
+            // DELETE /api/comments/{id}
+            delete("/{id}") {
+                val principal = call.principal<JWTPrincipal>() ?: return@delete call.respond(HttpStatusCode.Unauthorized)
+                val userId = principal.payload.getClaim("userId").asInt()
+                val commentId = call.parameters["id"]?.toIntOrNull() ?: return@delete call.respond(HttpStatusCode.BadRequest, "ID inválido")
+
+                val deletedRows = transaction {
+                    Comments.deleteWhere { Comments.id eq commentId and (Comments.userId eq userId) }
+                }
+
+                if (deletedRows > 0) {
+                    call.respond(HttpStatusCode.OK, "Comentario eliminado")
+                } else {
+                    call.respond(HttpStatusCode.Forbidden, "No tienes permiso para eliminar este comentario o no existe")
+                }
             }
         }
     }
