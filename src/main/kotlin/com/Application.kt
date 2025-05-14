@@ -153,27 +153,8 @@ fun Application.module() {
                 }
                 call.respond(HttpStatusCode.Created)
             }
-
-            /*POST /comments  Posiblemente deprecado por CommentRoutes.kt
-            post("/comments") {
-                val principal = call.principal<JWTPrincipal>()!!
-                val userId    = principal.payload.getClaim("userId").asInt()
-
-                val req = call.receive<CommentRequest>()
-                transaction {
-                    Games.insertIgnore {
-                        it[Games.id]   = req.gameId
-                        it[Games.name] = ""
-                    }
-                    Comments.insertIgnore {
-                        it[Comments.userId]  = userId
-                        it[Comments.gameId]  = req.gameId
-                        it[Comments.content] = req.content
-                    }
-                }
-                call.respond(HttpStatusCode.Created)
-            }*/
         }
+
 
         // sirve el frontend desde levelupfront/build
         staticFiles("/", File("levelupfront/build")) {
