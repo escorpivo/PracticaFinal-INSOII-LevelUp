@@ -3,7 +3,7 @@ import { Box, Typography, Chip, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import StarRating from "./StarRating";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 
 
@@ -13,8 +13,7 @@ const GameDetail = ({ game }) => {
   const navigate = useNavigate();
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState("");
-
-  if (!game) return <Typography>Juego no encontrado</Typography>;
+  const [comments, setComments] = useState([]);
 
   // Colores personalizados por plataforma
   const getPlatformColor = (platformName) => {
@@ -26,6 +25,24 @@ const GameDetail = ({ game }) => {
     return "#444"; // Color por defecto
   };
   
+
+useEffect(() => {
+  if (!game?.id) return;
+
+  fetch("http://localhost:8080/api/comments")
+    .then(res => res.json())
+    .then(data => {
+      const filtered = data.filter(c => c.gameId === game.id);
+      setComments(filtered);
+    })
+    .catch(err => console.error("Error al cargar comentarios:", err));
+}, [game?.id]);
+
+
+
+
+  if (!game) return <Typography>Juego no encontrado</Typography>;
+
 
   return (
     <Box p={4}>
@@ -128,17 +145,20 @@ const GameDetail = ({ game }) => {
       {/* Comentarios */}
       <Box sx={{ ml: { md: "20%" }, mt: 4 }}>
         <Typography variant="h6">Comentarios:</Typography>
-        {game.comments && game.comments.length > 0 ? (
-          game.comments.map((comment, index) => (
+        {comments.length > 0 ? (
+          comments.map((comment, index) => (
             <Box key={index} sx={{ mt: 2, p: 2, border: "1px solid #ccc", borderRadius: 2 }}>
-              <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
+              <Typography variant="subtitle2" fontWeight="bold">{comment.username}</Typography>
               <Typography variant="body2" sx={{ mt: 1 }}>{comment.content}</Typography>
-              <Typography variant="caption" color="text.secondary">{new Date(comment.commentedAt).toLocaleString()}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {new Date(comment.commentedAt).toLocaleString()}
+              </Typography>
             </Box>
           ))
         ) : (
           <Typography variant="body2" sx={{ mt: 1 }}>Aún no hay comentarios.</Typography>
         )}
+
       </Box>
       <Box sx={{ ml: { md: "20%" }, mt: 4 }}>
         <Typography variant="h6">Añadir valoración:</Typography>
