@@ -1,8 +1,8 @@
 package com
 
 import com.api.IGDBClient
-import com.api.RatingRequest
-import com.api.CommentRequest
+import api.RatingRequest
+import api.CommentRequest
 import com.database.DatabaseFactory  //Import añadido para inicializar la BD
 import com.database.Games
 import com.database.Ratings
@@ -34,6 +34,7 @@ import com.auth.JwtConfig
 import io.ktor.server.auth.Authentication
 import com.auth.SignupRequest
 import com.auth.LoginRequest
+import api.commentRoutes
 
 
 
@@ -101,6 +102,10 @@ fun Application.module() {
             call.respond(games)
         }
 
+        //metodo para gestionar comentarios
+        commentRoutes()
+
+
         // POST /signup
         post("/signup") {
             // recogemos el body como SignupRequest
@@ -149,7 +154,7 @@ fun Application.module() {
                 call.respond(HttpStatusCode.Created)
             }
 
-            // POST /comments
+            /*POST /comments  Posiblemente deprecado por CommentRoutes.kt
             post("/comments") {
                 val principal = call.principal<JWTPrincipal>()!!
                 val userId    = principal.payload.getClaim("userId").asInt()
@@ -167,7 +172,7 @@ fun Application.module() {
                     }
                 }
                 call.respond(HttpStatusCode.Created)
-            }
+            }*/
         }
 
         // sirve el frontend desde levelupfront/build
