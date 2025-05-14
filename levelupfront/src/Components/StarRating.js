@@ -5,22 +5,23 @@ export const StarRating = ({ initialRating = 0, onRate }) => {
   const [hover, setHover] = useState(null);
   const [lastClicked, setLastClicked] = useState(null);
 
-  const handleClick = (index, event) => {
-    event.stopPropagation(); 
-    setRating(index);
-    if (onRate) onRate(index);
 
-    if (onRate) onRate(index);
-     
-     if (rating === index) {
-       setRating(index - 0.5); // media estrella
-     } else if (rating === index - 0.5) {
-       setRating(index - 1); // desactiva solo esa estrella
-     } else {
-       setRating(index); // estrella completa
-     }
-   
-     if (onRate) onRate(rating);
+  const handleClick = (index, event) => {
+    event.stopPropagation();
+    let newValue;
+
+    if (rating === index) {
+      newValue = index - 0.5;
+    }
+    else if (rating === index - 0.5) {
+      newValue = index - 1 >= 0 ? index - 1 : 0;
+    }
+    else {
+      newValue = index;
+    }
+
+    setRating(newValue);
+    if (onRate) onRate(newValue);
   };
   
 
