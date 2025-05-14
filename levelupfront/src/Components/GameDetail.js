@@ -2,9 +2,17 @@ import React from 'react';
 import { Box, Typography, Chip, Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import StarRating from "./StarRating";
+import { useState } from 'react';
+import TextField from '@mui/material/TextField';
+
+
+
 
 const GameDetail = ({ game }) => {
   const navigate = useNavigate();
+  const [newRating, setNewRating] = useState(0);
+  const [newComment, setNewComment] = useState("");
 
   if (!game) return <Typography>Juego no encontrado</Typography>;
 
@@ -17,6 +25,7 @@ const GameDetail = ({ game }) => {
     if (name.includes("windows") || name.includes("pc")) return "#666"; // Gris
     return "#444"; // Color por defecto
   };
+  
 
   return (
     <Box p={4}>
@@ -65,6 +74,19 @@ const GameDetail = ({ game }) => {
         </Box>
       </Box>
 
+      {/* Rating del juego */}
+      <Box sx={{ ml: { md: "20%" }, mt: 4 }}>
+        <Typography variant="h4">Puntuación general</Typography>
+
+        <Box mt={2}>
+          <StarRating 
+            value={game.averageRating}
+            precision={0.5} // o 0.1 si quieres más fino
+            readOnly
+          />
+        </Box>
+      </Box>
+
       {/* Plataformas */}
       <Box sx={{ ml: { md: "20%" }, mb: 2 }}>
         <Typography variant="h6">Plataformas:</Typography>
@@ -102,6 +124,71 @@ const GameDetail = ({ game }) => {
           ))}
         </Box>
       )}
+
+      {/* Comentarios */}
+      <Box sx={{ ml: { md: "20%" }, mt: 4 }}>
+        <Typography variant="h6">Comentarios:</Typography>
+        {game.comments && game.comments.length > 0 ? (
+          game.comments.map((comment, index) => (
+            <Box key={index} sx={{ mt: 2, p: 2, border: "1px solid #ccc", borderRadius: 2 }}>
+              <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
+              <Typography variant="body2" sx={{ mt: 1 }}>{comment.content}</Typography>
+              <Typography variant="caption" color="text.secondary">{new Date(comment.commentedAt).toLocaleString()}</Typography>
+            </Box>
+          ))
+        ) : (
+          <Typography variant="body2" sx={{ mt: 1 }}>Aún no hay comentarios.</Typography>
+        )}
+      </Box>
+      <Box sx={{ ml: { md: "20%" }, mt: 4 }}>
+        <Typography variant="h6">Añadir valoración:</Typography>
+
+        <Box display="flex" alignItems="center" gap={2} mt={1}>
+          <Typography>Tu puntuación:</Typography>
+            <Box mt={2}>
+              <StarRating 
+                initialRating={newRating}
+                onRate={(val) => setNewRating(val)}
+              />
+            </Box>
+          
+          <Typography>{newRating.toFixed(1)} / 5</Typography>
+        </Box>
+
+        <TextField
+          fullWidth
+          label="Tu comentario"
+          multiline
+          rows={3}
+          sx={{ mt: 2, maxWidth: "600px" }}
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+        />
+
+        <Button
+          variant="contained"
+          sx={{ mt: 2 }}
+          onClick={() => {
+            if (newRating > 0 && newComment.trim()) {
+              // Aquí deberías hacer el POST a tu API
+              console.log("Enviando...", {
+                rating: newRating,
+                comment: newComment
+              });
+              // Reset
+              setNewRating(0);
+              setNewComment("");
+              alert("¡Gracias por tu valoración!");
+            } else {
+              alert("Por favor, completa ambos campos.");
+            }
+          }}
+        >
+          Enviar valoración
+        </Button>
+      </Box>
+
+
     </Box>
   );
 };
