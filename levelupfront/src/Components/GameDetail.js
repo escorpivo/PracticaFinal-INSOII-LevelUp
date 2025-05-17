@@ -15,10 +15,16 @@ const GameDetail = ({ game }) => {
     const [newComment, setNewComment] = useState("");
     const [comments, setComments] = useState([]);
 
+    //para el put de comentarios
+    const [editCommentId, setEditCommentId] = useState(null);
+    const [editedContent, setEditedContent] = useState("");
+
+
     const token = localStorage.getItem("token");
     const loggedUserId = token ? jwtDecode(token).userId : null;
 
 
+    //eliminación de comentarios
     const handleDelete = async (commentId) => {
         try {
             await fetch(`http://localhost:8080/api/comments/${commentId}`, {
@@ -39,6 +45,33 @@ const GameDetail = ({ game }) => {
     };
 
 
+    //edit de comentarios
+    const handleEdit = async () => {
+        try {
+            await fetch(`http://localhost:8080/api/comments/${editCommentId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    content: editedContent,
+                    gameId: game.id, // requerido por el backend
+                }),
+            });
+
+            setEditCommentId(null);
+            setEditedContent("");
+
+            const res = await fetch("http://localhost:8080/api/comments");
+            const data = await res.json();
+            const filtered = data.filter(c => c.gameId === game.id);
+            setComments(filtered);
+        } catch (err) {
+            console.error("Error al editar comentario:", err);
+            alert("Error al editar el comentario");
+        }
+    };
 
     // Colores personalizados por plataforma
     const getPlatformColor = (platformName) => {
@@ -174,19 +207,67 @@ const GameDetail = ({ game }) => {
                     comments.map((comment, index) => (
                         <Box key={index} sx={{ mt: 2, p: 2, border: "1px solid #ccc", borderRadius: 2 }}>
                             <Typography variant="subtitle2" fontWeight="bold">{comment.username}</Typography>
-                            <Typography variant="body2" sx={{ mt: 1 }}>{comment.content}</Typography>
+
+                            {/* con esto convertimos el comentario en un campo editable */}
+                            {editCommentId === comment.id ? (
+                                <>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        rows={2}
+                                        value={editedContent}
+                                        onChange={(e) => setEditedContent(e.target.value)}
+                                        sx={{ mt: 1 }}/>
+                                    <Button
+                                        size="small"
+                                        variant="contained"
+                                        sx={{ mt: 1, mr: 1 }}
+                                        onClick={handleEdit}>
+                                        Guardar
+                                    </Button>
+                                    <Button
+                                        size="small"
+                                        color="secondary"
+                                        sx={{ mt: 1 }}
+                                        onClick={() => {
+                                            setEditCommentId(null);
+                                            setEditedContent("");
+                                        }}>
+                                        Cancelar
+                                    </Button>
+                                </>
+                            ) : (
+                                <Typography variant="body2" sx={{ mt: 1 }}>{comment.content}</Typography>
+                            )}
+
                             <Typography variant="caption" color="text.secondary">
                                 {new Date(comment.commentedAt).toLocaleString()}
                             </Typography>
-
+                            {/* parte para eliminar o editar comentarios y que solo pueda el usuario que lo creó */}
                             {comment.userId === loggedUserId && (
-                                <Button
-                                    size="small"
-                                    color="error"
-                                    sx={{ mt: 1 }}
-                                    onClick={() => handleDelete(comment.id)}>
-                                    Eliminar
-                                </Button>
+                                <>
+                                    {/* botón editar */}
+                                    <Button
+                                        size="small"
+                                        sx={{ mt: 1, mr: 1 }}
+                                        onClick={() => {
+                                            setEditCommentId(comment.id);
+                                            setEditedContent(comment.content);
+                                        }}
+                                    >
+                                        Editar
+                                    </Button>
+
+                                    {/* botón eliminar */}
+                                    <Button
+                                        size="small"
+                                        color="error"
+                                        sx={{ mt: 1 }}
+                                        onClick={() => handleDelete(comment.id)}
+                                    >
+                                        Eliminar
+                                    </Button>
+                                </>
                             )}
                         </Box>
                     ))
