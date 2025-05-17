@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import StarRating from "./StarRating";
 import { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
-
+import jwtDecode from "jwt-decode";
 
 
 
@@ -188,20 +188,37 @@ useEffect(() => {
         <Button
           variant="contained"
           sx={{ mt: 2 }}
-          onClick={() => {
-            if (newRating > 0 && newComment.trim()) {
-              // Aquí deberías hacer el POST a tu API
-              console.log("Enviando...", {
-                rating: newRating,
-                comment: newComment
-              });
-              // Reset
-              setNewRating(0);
-              setNewComment("");
-              alert("¡Gracias por tu valoración!");
-            } else {
-              alert("Por favor, completa ambos campos.");
-            }
+          onClick={async () => {
+              if (newComment.trim()) {
+                  const token = localStorage.getItem("token");
+
+                  try {
+                      await fetch("http://localhost:8080/api/comments", {
+                          method: "POST",
+                          headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${token}`,
+                          },
+                          body: JSON.stringify({
+                              gameId: game.id,
+                              content: newComment,
+                          }),
+                      });
+
+                      const res = await fetch("http://localhost:8080/api/comments");
+                      const data = await res.json();
+                      const filtered = data.filter(c => c.gameId === game.id);
+                      setComments(filtered);
+
+                      setNewComment("");
+                      alert("¡Gracias por tu comentario!");
+                  } catch (err) {
+                      console.error("Error al enviar comentario:", err);
+                      alert("Error al enviar comentario");
+                  }
+              } else {
+                  alert("Por favor, escribe un comentario.");
+              }
           }}
         >
           Enviar valoración
