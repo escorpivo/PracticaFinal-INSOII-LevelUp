@@ -52,6 +52,24 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         }
     }
 
+
+    // Cacheamos temporalmente los juegos de IGDB para evitar peticiones repetidas y reducir la latencia.
+    // TTL actual: 60 segundos. Suficiente para evitar sobrecargar la API y mejorar tiempos de respuesta.
+    private var cachedGames: List<Game>? = null
+    private var lastFetch: Long = 0L
+
+    suspend fun fetchGamesCached(): List<Game> {
+        val now = System.currentTimeMillis()
+        return if (cachedGames != null && now - lastFetch < 60_000) {
+            cachedGames!!
+        } else {
+            val freshGames = fetchGames() // original
+            cachedGames = freshGames
+            lastFetch = now
+            freshGames
+        }
+    }
+
     // obtenemos los juegos desde IGDB haciendo petición al endpoint /games
     suspend fun fetchGames(): List<Game> {
         authorize()
