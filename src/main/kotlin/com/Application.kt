@@ -78,12 +78,17 @@ fun Application.module() {
         })
     }
     install(CORS) {
-        // Anyhost es Solo para desarrollo, no usar en producción, acarrea problemas de seguridad
+
+        //Solo lo vamos a tener en desarrollo
         anyHost()
         allowMethod(HttpMethod.Get)
         allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
         allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
     }
+
 
     // hay que crear un .env para evitar que los datos viajen por aqui
     val igdbClient = IGDBClient(
