@@ -8,8 +8,11 @@ fun Route.gameRoutes(igdbClient: IGDBClient) {
     route("/api/games") {
         get {
             try {
-                val games = igdbClient.fetchGames() // Llamamos al cliente de IGDB
-                call.respond(games) // Respondemos el JSON directamente
+                // Llamamos a la función para obtener juegos
+                val games = igdbClient.fetchGamesCached()
+
+                // Respondemos el JSON directamente para que el front lo tenga fácil
+                call.respond(games)
             } catch (e: Exception) {
                 // Manejamos errores y los devolvemos como respuesta
                 call.respondText("Error al obtener los juegos: ${e.message}")

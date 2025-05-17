@@ -103,13 +103,11 @@ fun Application.module() {
     routing {
         // ruta para obtener los juegos, de la función fetchGames de IGDBClient
         get("/games") {
-            val games = igdbClient.fetchGames()
+            val games = igdbClient.fetchGamesCached()
             call.respond(games)
         }
-
         //metodo para gestionar comentarios
         commentRoutes()
-
 
         // POST /signup
         post("/signup") {
@@ -130,6 +128,7 @@ fun Application.module() {
                     HttpStatusCode.Unauthorized,
                     mapOf("error" to "Credenciales inválidas")
                 )
+            
             // generamos token JWT a partir del usuario
             val token = JwtConfig.generateToken(user.email, user.id)
             call.respond(mapOf("token" to token))
