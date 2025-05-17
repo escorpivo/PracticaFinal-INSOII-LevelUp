@@ -1,17 +1,16 @@
 package api
 
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import com.database.Comments
 import com.database.Games
 import com.database.Users
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.format.DateTimeFormatter
 
@@ -91,7 +90,7 @@ fun Route.commentRoutes() {
                 val commentId = call.parameters["id"]?.toIntOrNull() ?: return@delete call.respond(HttpStatusCode.BadRequest, "ID inválido")
 
                 val deletedRows = transaction {
-                    Comments.deleteWhere { Comments.id eq commentId and (Comments.userId eq userId) }
+                    Comments.deleteWhere {id eq commentId and (Comments.userId eq userId) }
                 }
 
                 if (deletedRows > 0) {
