@@ -36,9 +36,13 @@ object JwtConfig {
           .withAudience(audience)
           .build()
       )
-      validate { creds ->
-        creds.payload.getClaim("email").asString()?.let { JWTPrincipal(creds.payload) }
-      }
+        validate { creds ->
+            val email = creds.payload.getClaim("email").asString()
+            val userId = creds.payload.getClaim("userId").asInt()
+
+            if (email != null && userId != null) JWTPrincipal(creds.payload) else null
+        }
+
     }
   }
 }
