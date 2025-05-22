@@ -20,6 +20,7 @@ function MainLayout(props) {
     setSelectedGenre,
     selectedPlatform,
     setSelectedPlatform,
+    onSearch
   } = props;
 
   return (
@@ -28,6 +29,7 @@ function MainLayout(props) {
         onChangeView={setActiveView}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        onSearch={onSearch}
       />
       <Box display="flex" flexGrow={1}>
         <Sidebar
@@ -44,8 +46,9 @@ function MainLayout(props) {
   );
 }
 
-
 function App() {
+  const [games, setGames] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState("cards");
   const [darkMode, setDarkMode] = useState(() => {
     const stored = localStorage.getItem("darkMode");
@@ -65,6 +68,28 @@ function App() {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
 
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const baseUrl = "http://localhost:8080";
+        const url = searchQuery
+          ? `${baseUrl}/api/games?search=${encodeURIComponent(searchQuery)}`
+          : `${baseUrl}/api/games`;
+        const res = await fetch(url);
+        const data = await res.json();
+        setGames(data);
+      } catch (err) {
+        console.error("Error al cargar juegos:", err);
+      }
+    };
+    fetchGames();
+  }, [searchQuery]);
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    setActiveView("cards");
+  };
+
   return (
     <Router>
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
@@ -82,12 +107,14 @@ function App() {
                 setSelectedGenre={setSelectedGenre}
                 selectedPlatform={selectedPlatform}
                 setSelectedPlatform={setSelectedPlatform}
+                onSearch={handleSearch}
               >
                 {activeView === "cards" && (
                   <CardsHolder
                     darkMode={darkMode}
                     selectedGenre={selectedGenre}
                     selectedPlatform={selectedPlatform}
+                    games={games}
                   />
                 )}
                 {activeView === "settings" && (
@@ -111,6 +138,7 @@ function App() {
                 setSelectedGenre={setSelectedGenre}
                 selectedPlatform={selectedPlatform}
                 setSelectedPlatform={setSelectedPlatform}
+                onSearch={handleSearch}
               >
                 {activeView === "settings" ? (
                   <SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />
@@ -120,7 +148,6 @@ function App() {
               </MainLayout>
             }
           />
-
         </Routes>
       </ThemeProvider>
     </Router>

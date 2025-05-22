@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Button, Box } from "@mui/material";
 import SearchBar from "./UI_Searchbar";
 import { useNavigate } from "react-router-dom";
 
-const TopNav = ({ onChangeView }) => {
+const TopNav = ({ onChangeView, onSearch  }) => {
     const navigate = useNavigate();
 
     return (
@@ -53,7 +53,7 @@ const TopNav = ({ onChangeView }) => {
                 </Box>
 
                 <Box sx={{ marginLeft: "auto" }}>
-                    <SearchBar />
+                    <SearchBar onSearch={onSearch} />
                 </Box>
             </Toolbar>
         </AppBar>
