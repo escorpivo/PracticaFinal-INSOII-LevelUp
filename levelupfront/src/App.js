@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import CardsHolder from './Components/UI_CardsHolder';
@@ -6,7 +7,7 @@ import Sidebar from "./Components/UI_Sidebar";
 import SettingsPage from "./Components/UI_Settings";
 import GameDetailWrapper from "./Components/GameDetailWrapper";
 
-import { Box, ThemeProvider, createTheme, CssBaseline } from "@mui/material";
+import { Box, ThemeProvider, createTheme, CssBaseline, LinearProgress } from "@mui/material";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function MainLayout(props) {
@@ -56,6 +57,7 @@ function App() {
   });
   const [selectedGenre, setSelectedGenre] = useState("");
   const [selectedPlatform, setSelectedPlatform] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
@@ -70,6 +72,7 @@ function App() {
 
   useEffect(() => {
     const fetchGames = async () => {
+      setLoading(true);
       try {
         const baseUrl = "http://localhost:8080";
         const url = searchQuery
@@ -80,6 +83,8 @@ function App() {
         setGames(data);
       } catch (err) {
         console.error("Error al cargar juegos:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchGames();
@@ -94,6 +99,7 @@ function App() {
     <Router>
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
         <CssBaseline />
+        {loading && <LinearProgress />}
         <Routes>
           <Route
             path="/"
