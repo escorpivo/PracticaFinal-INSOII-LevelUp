@@ -76,8 +76,8 @@ function App() {
       try {
         const baseUrl = "http://localhost:8080";
         const url = searchQuery
-          ? `${baseUrl}/api/games?search=${encodeURIComponent(searchQuery)}`
-          : `${baseUrl}/api/games`;
+          ? `${baseUrl}/games?search=${encodeURIComponent(searchQuery)}`
+          : `${baseUrl}/games`;
         const res = await fetch(url);
         const data = await res.json();
         setGames(data);
