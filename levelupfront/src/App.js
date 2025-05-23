@@ -6,6 +6,7 @@ import TopNav from "./Components/UI_TopNav";
 import Sidebar from "./Components/UI_Sidebar";
 import SettingsPage from "./Components/UI_Settings";
 import GameDetailWrapper from "./Components/GameDetailWrapper";
+import Login from './Components/Login';
 
 import { Box, ThemeProvider, createTheme, CssBaseline, LinearProgress } from "@mui/material";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -61,6 +62,8 @@ function App() {
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
+  const [token, setToken] = useState('');
+
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark' : '';
@@ -101,6 +104,7 @@ function App() {
         <CssBaseline />
         {loading && <LinearProgress />}
         <Routes>
+          <Route path="/login" element={<Login onLogin={setToken} />} />
           <Route
             path="/"
             element={
