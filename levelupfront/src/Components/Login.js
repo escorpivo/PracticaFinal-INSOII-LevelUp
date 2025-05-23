@@ -39,8 +39,13 @@ const Login = ({ onLogin }) => {
         alignItems="center"
         height="100vh"
         sx={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            backgroundImage: 'url("/GIF2.gif")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            position: 'relative',
         }}
+
         >
         <Paper elevation={6} sx={{ p: 5, width: 500, minHeight: 380, borderRadius: 3 }}>
             <Typography
@@ -87,12 +92,14 @@ const Login = ({ onLogin }) => {
                 '&:hover': {
                 bgcolor: '#8E2DE2',
                 },
+                width: 420, minHeight: 70
             }}
             >
             Entrar
             </Button>
 
             </form>
+            
         </Paper>
     </Box>
 
