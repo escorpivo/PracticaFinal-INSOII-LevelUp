@@ -8,7 +8,7 @@ const GameDetailWrapper = () => {
   const [game, setGame] = useState(null);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8080/api/games")
+    axios.get("http://127.0.0.1:8080/games")
       .then((response) => {
         const found = response.data.find(g => g.id === parseInt(id));
         setGame(found);
