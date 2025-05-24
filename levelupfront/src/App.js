@@ -7,6 +7,7 @@ import Sidebar from "./Components/UI_Sidebar";
 import SettingsPage from "./Components/UI_Settings";
 import GameDetailWrapper from "./Components/GameDetailWrapper";
 import Login from './Components/Login';
+import Register from './Components/Register';
 
 import { Box, ThemeProvider, createTheme, CssBaseline, LinearProgress } from "@mui/material";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -105,6 +106,7 @@ function App() {
         {loading && <LinearProgress />}
         <Routes>
           <Route path="/login" element={<Login onLogin={setToken} />} />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/"
             element={

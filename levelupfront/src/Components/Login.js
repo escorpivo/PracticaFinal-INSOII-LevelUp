@@ -97,6 +97,19 @@ const Login = ({ onLogin }) => {
             >
             Entrar
             </Button>
+            <Typography
+                variant="body2"
+                textAlign="center"
+                mt={3}
+                >
+                ¿No tienes cuenta?{' '}
+                <span
+                    style={{ color: '#4A00E0', fontWeight: 'bold', cursor: 'pointer' }}
+                    onClick={() => navigate('/register')}
+                >
+                    ¡Regístrate!
+                </span>
+            </Typography>
 
             </form>
             
