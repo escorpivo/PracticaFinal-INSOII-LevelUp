@@ -84,7 +84,6 @@ function App() {
         try {
           const res = await fetch("https://practicafinal-insoii-levelup.onrender.com/games");
           const data = await res.json();
-          console.log("Desde Render:", data);
           setGames(data);
         } catch (err2) {
           console.error("Error al cargar juegos desde Render:", err2);

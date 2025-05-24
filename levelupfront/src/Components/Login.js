@@ -4,6 +4,10 @@ import axios from 'axios';
 import GamepadIcon from '@mui/icons-material/SportsEsports';
 import { useNavigate } from 'react-router-dom';
 
+const baseUrl = window.location.hostname === "localhost"
+    ? "http://localhost:8080"
+    : "https://practicafinal-insoii-levelup.onrender.com";
+
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +18,7 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     setError('');
     try {
-      const res = await axios.post('http://localhost:8080/login', {
+        const res = await axios.post(`${baseUrl}/login`, {
         email,
         password,
       });
