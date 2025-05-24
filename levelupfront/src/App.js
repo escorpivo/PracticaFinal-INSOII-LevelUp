@@ -1,5 +1,5 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import CardsHolder from './Components/UI_CardsHolder';
 import TopNav from "./Components/UI_TopNav";
@@ -8,9 +8,7 @@ import SettingsPage from "./Components/UI_Settings";
 import GameDetailWrapper from "./Components/GameDetailWrapper";
 import Login from './Components/Login';
 import Register from './Components/Register';
-
 import { Box, ThemeProvider, createTheme, CssBaseline, LinearProgress } from "@mui/material";
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function MainLayout(props) {
   const {
@@ -60,11 +58,10 @@ function App() {
   const [selectedGenre, setSelectedGenre] = useState("");
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(() => localStorage.getItem('token') || '');
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
-  const [token, setToken] = useState('');
-
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark' : '';
@@ -105,11 +102,18 @@ function App() {
         <CssBaseline />
         {loading && <LinearProgress />}
         <Routes>
+          {/* Redirección inicial */}
+          <Route path="/" element={<Navigate to="/login" />} />
+
+          {/* Login y Registro */}
           <Route path="/login" element={<Login onLogin={setToken} />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Rutas protegidas */}
           <Route
-            path="/"
+            path="/home"
             element={
+            token ? (
               <MainLayout
                 activeView={activeView}
                 setActiveView={setActiveView}
@@ -136,11 +140,15 @@ function App() {
                   />
                 )}
               </MainLayout>
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
             path="/game/:id"
             element={
+              token ? (
               <MainLayout
                 activeView={activeView}
                 setActiveView={setActiveView}
@@ -152,12 +160,11 @@ function App() {
                 setSelectedPlatform={setSelectedPlatform}
                 onSearch={handleSearch}
               >
-                {activeView === "settings" ? (
-                  <SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />
-                ) : (
                   <GameDetailWrapper />
-                )}
               </MainLayout>
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
         </Routes>
