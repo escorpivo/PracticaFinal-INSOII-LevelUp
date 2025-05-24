@@ -38,9 +38,6 @@ build/
 # Variables de entorno sensibles
 .env
 
-# Tests si no quieres subirlos
-src/test/
-
 # Archivos del sistema
 .DS_Store
 Thumbs.db
