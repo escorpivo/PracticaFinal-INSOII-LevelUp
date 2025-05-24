@@ -7,6 +7,9 @@ import { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import { jwtDecode } from "jwt-decode";
 
+const baseUrl = window.location.hostname === "localhost"
+    ? "http://localhost:8080"
+    : "https://practicafinal-insoii-levelup.onrender.com";
 
 
 const GameDetail = ({ game }) => {
@@ -27,14 +30,14 @@ const GameDetail = ({ game }) => {
     //eliminación de comentarios
     const handleDelete = async (commentId) => {
         try {
-            await fetch(`http://localhost:8080/api/comments/${commentId}`, {
+            await fetch(`${baseUrl}/api/comments/${commentId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
-            const res = await fetch("http://localhost:8080/api/comments");
+            const res = await fetch(`${baseUrl}/api/comments`);
             const data = await res.json();
             const filtered = data.filter(c => c.gameId === game.id);
             setComments(filtered);
@@ -48,7 +51,7 @@ const GameDetail = ({ game }) => {
     //edit de comentarios
     const handleEdit = async () => {
         try {
-            await fetch(`http://localhost:8080/api/comments/${editCommentId}`, {
+            await fetch(`${baseUrl}/api/comments/${editCommentId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -63,7 +66,7 @@ const GameDetail = ({ game }) => {
             setEditCommentId(null);
             setEditedContent("");
 
-            const res = await fetch("http://localhost:8080/api/comments");
+            const res = await fetch(`${baseUrl}/api/comments`);
             const data = await res.json();
             const filtered = data.filter(c => c.gameId === game.id);
             setComments(filtered);
@@ -87,7 +90,7 @@ const GameDetail = ({ game }) => {
     useEffect(() => {
         if (!game?.id) return;
 
-        fetch("http://localhost:8080/api/comments")
+        fetch(`${baseUrl}/api/comments`)
             .then(res => res.json())
             .then(data => {
                 const filtered = data.filter(c => c.gameId === game.id);
@@ -309,7 +312,7 @@ const GameDetail = ({ game }) => {
                             const token = localStorage.getItem("token");
 
                             try {
-                                await fetch("http://localhost:8080/api/comments", {
+                                await fetch(`${baseUrl}/api/comments`, {
                                     method: "POST",
                                     headers: {
                                         "Content-Type": "application/json",
@@ -321,7 +324,7 @@ const GameDetail = ({ game }) => {
                                     }),
                                 });
 
-                                const res = await fetch("http://localhost:8080/api/comments");
+                                const res = await fetch(`${baseUrl}/api/comments`);
                                 const data = await res.json();
                                 const filtered = data.filter(c => c.gameId === game.id);
                                 setComments(filtered);
