@@ -10,6 +10,10 @@ import Login from './Components/Login';
 import Register from './Components/Register';
 import { Box, ThemeProvider, createTheme, CssBaseline, LinearProgress } from "@mui/material";
 
+const baseUrl = window.location.hostname === "localhost"
+    ? "http://localhost:8080"
+    : "https://practicafinal-insoii-levelup.onrender.com";
+
 function MainLayout(props) {
   const {
     children,
@@ -74,20 +78,12 @@ function App() {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        // Intentar primero en localhost
-        const res = await fetch("http://localhost:8080/games");
-        if (!res.ok) throw new Error("Localhost no responde");
+        const res = await fetch(`${baseUrl}/games`);
+        if (!res.ok) throw new Error("Error al cargar juegos");
         const data = await res.json();
         setGames(data);
       } catch (err) {
-        console.warn("Fallo en localhost, probando con Render...");
-        try {
-          const res = await fetch("https://practicafinal-insoii-levelup.onrender.com/games");
-          const data = await res.json();
-          setGames(data);
-        } catch (err2) {
-          console.error("Error al cargar juegos desde Render:", err2);
-        }
+        console.error("Error al cargar juegos:", err);
       }
     };
 
