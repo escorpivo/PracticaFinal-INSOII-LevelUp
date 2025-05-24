@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+const baseUrl = window.location.hostname === "localhost"
+    ? "http://localhost:8080"
+    : "https://practicafinal-insoii-levelup.onrender.com";
+
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -12,7 +16,7 @@ const Register = () => {
   e.preventDefault();
 
   try {
-    const res = await fetch('http://localhost:8080/signup', {
+    const res = await fetch(`${baseUrl}/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -28,7 +32,7 @@ const Register = () => {
     }
 
     // 👇 login automático tras registro
-    const loginRes = await fetch('http://localhost:8080/login', {
+    const loginRes = await fetch(`${baseUrl}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
