@@ -8,12 +8,44 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    
-    console.log('Registrando usuario:', { name, email, password });
-    navigate('/login');
-  };
+  const handleRegister = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch('http://localhost:8080/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: name,
+        email,
+        password
+      })
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || 'Error en el registro');
+    }
+
+    // 👇 login automático tras registro
+    const loginRes = await fetch('http://localhost:8080/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const loginData = await loginRes.json();
+    localStorage.setItem('token', loginData.token);
+    navigate('/');
+
+  } catch (error) {
+    console.error('Error en el registro:', error);
+    alert(error.message || 'No se pudo registrar. Intenta de nuevo.');
+  }
+};
+
+
+
 
   return (
     <Box
