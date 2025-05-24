@@ -3,7 +3,6 @@ import { Box, Button, TextField, Typography, Paper } from '@mui/material';
 import axios from 'axios';
 import GamepadIcon from '@mui/icons-material/SportsEsports';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; 
 
 
 const Login = ({ onLogin }) => {
@@ -23,8 +22,15 @@ const Login = ({ onLogin }) => {
       });
 
       const token = res.data.token;
+      if (!token) throw new Error('No se recibió token');
+
+
+      localStorage.setItem('token', token);
       onLogin(token);
+      navigate('/');
+
     } catch (err) {
+      console.error('Login error:', err);
       setError('Credenciales inválidas');
     }
 
