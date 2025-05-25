@@ -37,8 +37,12 @@ const TopNav = ({ onChangeView, onSearch  }) => {
                     >
                         Inicio
                     </Button>
-                    <Button color="inherit" sx={{ fontWeight: "bold" }}>
-                        Biblioteca
+                    <Button
+                    color="inherit"
+                    sx={{ fontWeight: "bold" }}
+                    onClick={() => navigate('/library')}
+                    >
+                    Biblioteca
                     </Button>
                     <Button color="inherit" sx={{ fontWeight: "bold" }}>
                         Estadísticas

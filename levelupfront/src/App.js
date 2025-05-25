@@ -14,6 +14,8 @@ import SettingsPage from "./Components/UI_Settings";
 import GameDetailWrapper from "./Components/GameDetailWrapper";
 import Login from './Components/Login';
 import Register from './Components/Register';
+import Library from './Components/Library'; 
+
 import {
   Box,
   ThemeProvider,
@@ -174,6 +176,29 @@ function AppContent() {
                 onLogout={handleLogout}
               >
                 <GameDetailWrapper />
+              </MainLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/library"
+          element={
+            token ? (
+              <MainLayout
+                activeView={activeView}
+                setActiveView={setActiveView}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                selectedGenre={selectedGenre}
+                setSelectedGenre={setSelectedGenre}
+                selectedPlatform={selectedPlatform}
+                setSelectedPlatform={setSelectedPlatform}
+                onSearch={handleSearch}
+                onLogout={handleLogout}
+              >
+                <Library token={token} />
               </MainLayout>
             ) : (
               <Navigate to="/login" />
