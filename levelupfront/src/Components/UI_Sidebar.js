@@ -14,6 +14,8 @@ import StarIcon from "@mui/icons-material/Star";
 import AddIcon from "@mui/icons-material/Add";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import LogoutIcon from '@mui/icons-material/Logout';
+
 
 const GENRE_LIST = [
   "Sin género",
@@ -57,7 +59,8 @@ const Sidebar = ({
   selectedGenre,
   onGenreChange,
   selectedPlatform,
-  onPlatformChange
+  onPlatformChange,
+  onLogout
 }) => {
   const [genreAnchorEl, setGenreAnchorEl] = useState(null);
   const [platformAnchorEl, setPlatformAnchorEl] = useState(null);
@@ -175,6 +178,14 @@ const Sidebar = ({
       <Box width="100%" display="flex" alignItems="center" gap={1}>
         <IconButton><AddIcon /></IconButton>
         {isExpanded && <Typography variant="body2">Añadir</Typography>}
+      </Box>
+
+      {/* Boton logout */}
+      <Box width="100%" display="flex" alignItems="center" gap={1} justifyContent={isExpanded ? "flex-start" : "center"} px={2} pb={2}>
+        <IconButton onClick={onLogout} title="Cerrar sesión">
+          <LogoutIcon />
+        </IconButton>
+        {isExpanded && <Typography variant="body2">Cerrar sesión</Typography>}
       </Box>
     </Box>
   );
