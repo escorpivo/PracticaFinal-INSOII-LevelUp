@@ -32,7 +32,7 @@ const TopNav = ({ onChangeView, onSearch  }) => {
                         sx={{ fontWeight: "bold" }}
                         onClick={() => {
                             onChangeView("cards");
-                            navigate("/");
+                            navigate("/home");
                         }}
                     >
                         Inicio

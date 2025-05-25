@@ -116,7 +116,7 @@ const GameDetail = ({ game }) => {
                 <Button
                     variant="outlined"
                     startIcon={<ArrowBackIcon />}
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/home")}
                     sx={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}
                 >
                     Volver
