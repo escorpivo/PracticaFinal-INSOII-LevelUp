@@ -105,3 +105,67 @@ body.dark .card-back-content {
   color: #f0f0f0;
   background-color: #1e1e1e;
 }
+
+
+
+.description {
+  font-size: 0.95rem;
+  padding: 0 16px 16px 16px;
+  color: #666;
+  line-height: 1.4;
+  height: 430px;
+  max-height: 430px;     /* <- nuevo: altura máxima visible */
+  overflow-y: auto;      /* <- nuevo: scroll vertical si excede */
+}
+
+
+.description::-webkit-scrollbar {
+  width: 6px;
+}
+
+.description::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+
+.card-back-content {
+  transform: rotateY(180deg);
+  height: 100%;
+  padding: 0;
+  position: relative;
+}
+
+.card-back-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.card-back-inner .description {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin: 12px 0;
+  padding-right: 6px;
+}
+
+.card-info-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  
+}
+
+.card-info-button:hover {
+  background-color: #0056b3;
+}

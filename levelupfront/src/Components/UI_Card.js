@@ -26,24 +26,23 @@ export const Card = ({ id, nombre, descripcion, imagen, rating }) => {
         </>
       ) : (
         <div className="card-back-content">
-          <h5>{nombre}</h5>
-          <div className='description'>
-            <p>{descripcion}</p>
+          <div className="card-back-inner">
+            <h5>{nombre}</h5>
+
+            <div className="description">
+              <p>{descripcion}</p>
+            </div>
+
+            <button
+              className="card-info-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = `/game/${id}`;
+              }}
+            >
+              Más info aquí
+            </button>
           </div>
-
-          
-          <p
-            onClick={(e) => {
-              e.stopPropagation();
-              window.location.href = `/game/${id}`;
-            }}
-            style={{ cursor: "pointer", color: "#007bff", textDecoration: "underline" }}
-          >
-            Más info aquí
-          </p>
-
-
-
         </div>
       )}
     </div>
