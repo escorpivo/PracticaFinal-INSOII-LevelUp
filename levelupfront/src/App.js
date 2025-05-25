@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, logout } from 'react-router-dom';
 import './App.css';
 import CardsHolder from './Components/UI_CardsHolder';
 import TopNav from "./Components/UI_TopNav";
@@ -8,6 +8,7 @@ import SettingsPage from "./Components/UI_Settings";
 import GameDetailWrapper from "./Components/GameDetailWrapper";
 import Login from './Components/Login';
 import Register from './Components/Register';
+
 import { Box, ThemeProvider, createTheme, CssBaseline, LinearProgress } from "@mui/material";
 
 const baseUrl = window.location.hostname === "localhost"
@@ -66,6 +67,7 @@ function App() {
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
+  const navLogout = logout();
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark' : '';
@@ -95,6 +97,13 @@ function App() {
     setActiveView("cards");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken('');
+    navLogout('/login'); 
+  };
+
+
   return (
     <Router>
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
@@ -123,6 +132,7 @@ function App() {
                 selectedPlatform={selectedPlatform}
                 setSelectedPlatform={setSelectedPlatform}
                 onSearch={handleSearch}
+                onLogout={handleLogout}
               >
                 {activeView === "cards" && (
                   <CardsHolder
