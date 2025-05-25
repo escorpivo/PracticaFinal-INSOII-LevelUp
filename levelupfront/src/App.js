@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, logout } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate
+} from 'react-router-dom';
 import './App.css';
 import CardsHolder from './Components/UI_CardsHolder';
 import TopNav from "./Components/UI_TopNav";
@@ -8,12 +14,17 @@ import SettingsPage from "./Components/UI_Settings";
 import GameDetailWrapper from "./Components/GameDetailWrapper";
 import Login from './Components/Login';
 import Register from './Components/Register';
-
-import { Box, ThemeProvider, createTheme, CssBaseline, LinearProgress } from "@mui/material";
+import {
+  Box,
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  LinearProgress
+} from "@mui/material";
 
 const baseUrl = window.location.hostname === "localhost"
-    ? "http://localhost:8080"
-    : "https://practicafinal-insoii-levelup.onrender.com";
+  ? "http://localhost:8080"
+  : "https://practicafinal-insoii-levelup.onrender.com";
 
 function MainLayout(props) {
   const {
@@ -26,7 +37,8 @@ function MainLayout(props) {
     setSelectedGenre,
     selectedPlatform,
     setSelectedPlatform,
-    onSearch
+    onSearch,
+    onLogout,
   } = props;
 
   return (
@@ -43,16 +55,16 @@ function MainLayout(props) {
           onGenreChange={setSelectedGenre}
           selectedPlatform={selectedPlatform}
           onPlatformChange={setSelectedPlatform}
+          onLogout={onLogout}
         />
-        <Box sx={{ flexGrow: 1, overflow: "auto" }}>
-          {children}
-        </Box>
+        <Box sx={{ flexGrow: 1, overflow: "auto" }}>{children}</Box>
       </Box>
     </Box>
   );
 }
 
-function App() {
+function AppContent() {
+  const navigate = useNavigate();
   const [games, setGames] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState("cards");
@@ -67,7 +79,6 @@ function App() {
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
-  const navLogout = logout();
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark' : '';
@@ -88,7 +99,6 @@ function App() {
         console.error("Error al cargar juegos:", err);
       }
     };
-
     fetchGames();
   }, [searchQuery]);
 
@@ -100,27 +110,20 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken('');
-    navLogout('/login'); 
+    navigate('/login');
   };
 
-
   return (
-    <Router>
-      <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-        <CssBaseline />
-        {loading && <LinearProgress />}
-        <Routes>
-          {/* Redirección inicial */}
-          <Route path="/" element={<Navigate to="/login" />} />
-
-          {/* Login y Registro */}
-          <Route path="/login" element={<Login onLogin={setToken} />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* Rutas protegidas */}
-          <Route
-            path="/home"
-            element={
+    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+      <CssBaseline />
+      {loading && <LinearProgress />}
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<Login onLogin={setToken} />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/home"
+          element={
             token ? (
               <MainLayout
                 activeView={activeView}
@@ -149,15 +152,15 @@ function App() {
                   />
                 )}
               </MainLayout>
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-          <Route
-            path="/game/:id"
-            element={
-              token ? (
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/game/:id"
+          element={
+            token ? (
               <MainLayout
                 activeView={activeView}
                 setActiveView={setActiveView}
@@ -168,16 +171,24 @@ function App() {
                 selectedPlatform={selectedPlatform}
                 setSelectedPlatform={setSelectedPlatform}
                 onSearch={handleSearch}
+                onLogout={handleLogout}
               >
-                  <GameDetailWrapper />
+                <GameDetailWrapper />
               </MainLayout>
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-        </Routes>
-      </ThemeProvider>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
+    </ThemeProvider>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
