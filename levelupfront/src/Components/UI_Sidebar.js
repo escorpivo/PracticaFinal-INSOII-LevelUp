@@ -15,6 +15,8 @@ import AddIcon from "@mui/icons-material/Add";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router-dom';
+
 
 
 const GENRE_LIST = [
@@ -68,6 +70,7 @@ const Sidebar = ({
 
   const openGenreMenu = Boolean(genreAnchorEl);
   const openPlatformMenu = Boolean(platformAnchorEl);
+  const navigate = useNavigate();
 
   const handleOpenGenreMenu = (event) => setGenreAnchorEl(event.currentTarget);
   const handleCloseGenreMenu = () => setGenreAnchorEl(null);
@@ -172,7 +175,9 @@ const Sidebar = ({
         {isExpanded && <Typography variant="body2">Categoría</Typography>}
       </Box>
       <Box width="100%" display="flex" alignItems="center" gap={1}>
-        <IconButton><StarIcon /></IconButton>
+        <IconButton onClick={() => navigate('/favorites')} title="Ir a favoritos">
+          <StarIcon />
+        </IconButton>
         {isExpanded && <Typography variant="body2">Favoritos</Typography>}
       </Box>
       <Box width="100%" display="flex" alignItems="center" gap={1}>
