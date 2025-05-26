@@ -36,6 +36,7 @@ import com.auth.SignupRequest
 import com.auth.LoginRequest
 import api.commentRoutes
 import api.favoriteRoutes
+import api.ratingRoutes
 
 
 
@@ -111,6 +112,7 @@ fun Application.module() {
         //metodo para gestionar comentarios
         commentRoutes()
         favoriteRoutes()
+        ratingRoutes()
 
         // POST /signup
         post("/signup") {
