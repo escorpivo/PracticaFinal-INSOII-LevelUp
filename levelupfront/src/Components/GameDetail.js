@@ -59,6 +59,7 @@ const GameDetail = ({ game }) => {
                 },
                 body: JSON.stringify({
                     content: editedContent,
+                    name: game.name,
                     gameId: game.id, // requerido por el backend
                 }),
             });
@@ -320,6 +321,7 @@ const GameDetail = ({ game }) => {
                                     },
                                     body: JSON.stringify({
                                         gameId: game.id,
+                                        name: game.name,
                                         content: newComment,
                                     }),
                                 });
