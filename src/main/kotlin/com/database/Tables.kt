@@ -51,3 +51,9 @@ object Comments : Table("comments") {
     val content     = text("content")
     val commentedAt = datetime("commented_at").defaultExpression(CurrentDateTime)
 }
+
+object Favorites : Table() {
+    val userId = integer("user_id").references(Users.id)
+    val gameId = long("game_id").references(Games.id)  
+    override val primaryKey = PrimaryKey(userId, gameId)
+}
