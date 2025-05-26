@@ -13,6 +13,7 @@ data class RatingRequest(
 @Serializable
 data class CommentRequest(
   val gameId: Long,
+  val name: String,
   val content: String  // Texto del comentario
 )
 

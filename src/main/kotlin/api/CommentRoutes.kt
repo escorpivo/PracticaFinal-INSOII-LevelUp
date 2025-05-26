@@ -37,7 +37,6 @@ fun Route.commentRoutes() {
         // POST /api/comments (requiere JWT)
         authenticate("auth-jwt") {
             post {
-
                 val principal = call.principal<JWTPrincipal>() ?: return@post call.respond(HttpStatusCode.Unauthorized)
                 val userId = principal.payload.getClaim("userId").asInt()
 
@@ -47,7 +46,7 @@ fun Route.commentRoutes() {
                     // Asegura que el juego existe
                     Games.insertIgnore {
                         it[id] = req.gameId
-                        it[name] = ""
+                        it[name] = req.name
                     }
 
                     Comments.insert {
