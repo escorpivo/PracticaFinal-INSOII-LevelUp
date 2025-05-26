@@ -2,27 +2,31 @@ import React from "react";
 import { Box, Grid } from "@mui/material";
 import Card from "./UI_Card";
 
+const baseUrl = window.location.hostname === "localhost"
+    ? "http://localhost:8080"
+    : "https://practicafinal-insoii-levelup.onrender.com";
+
 const CardsHolder = ({ darkMode, selectedGenre, selectedPlatform, games }) => {
   // Función para marcar como favorito
-  const addToFavorites = async (gameId) => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8080/favorites`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ gameId })
-      });
+  const addToFavorites = async (gameId, name, coverUrl) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${baseUrl}/favorites`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        gameId,
+        name,
+        coverUrl: coverUrl || "/fallback.png"
+      })
+    });
 
-      if (!res.ok) throw new Error("Error al guardar favorito");
-
-      alert("¡Agregado a favoritos!");
-    } catch (err) {
-      console.error(err);
-    }
+    if (!res.ok) throw new Error("Error al guardar favorito");
+    alert("¡Agregado a favoritos!");
   };
+
 
   // Filtrar juegos por género y plataforma
   const filteredGames = games.filter(game => {
@@ -51,7 +55,7 @@ const CardsHolder = ({ darkMode, selectedGenre, selectedPlatform, games }) => {
               imagen={game.coverUrl}
               rating={game.rating}
               darkMode={darkMode}
-              addToFavorites={addToFavorites} // 💥 aquí se pasa la función
+              addToFavorites={() => addToFavorites(game.id, game.name, game.coverUrl)}
             />
           </Grid>
         ))}

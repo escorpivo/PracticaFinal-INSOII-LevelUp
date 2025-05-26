@@ -54,6 +54,7 @@ object Comments : Table("comments") {
 
 object Favorites : Table() {
     val userId = integer("user_id").references(Users.id)
-    val gameId = long("game_id").references(Games.id)  
+    val gameId = long("game_id").references(Games.id)
+    val coverUrl = varchar("cover_url", 255)
     override val primaryKey = PrimaryKey(userId, gameId)
 }

@@ -3,6 +3,7 @@ package api
 
 import com.database.Favorites
 import com.database.Games
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,18 +19,44 @@ fun Route.favoriteRoutes() {
 
     authenticate("auth-jwt") {
 
+        //para el post
+        @kotlinx.serialization.Serializable
+        data class FavoriteRequest(
+            val gameId: Long,
+            val name: String,
+            val coverUrl: String
+        )
+
+        //para el get
+        @kotlinx.serialization.Serializable
+        data class FavoriteResponse(
+            val id: Long,
+            val name: String,
+            val coverUrl: String
+        )
+
+
+
         post("/favorites") {
             val principal = call.principal<JWTPrincipal>()!!
             val userId = principal.payload.getClaim("userId").asInt()
-
-            val body = call.receive<Map<String, Long>>()
-            val gameId = body["gameId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+            val req = call.receive<FavoriteRequest>()
 
             transaction {
+                // Insertar en Games si no existe
+                val gameExists = Games.select { Games.id eq req.gameId }.empty().not()
+                if (!gameExists) {
+                    Games.insert {
+                        it[Games.id] = req.gameId
+                        it[Games.name] = req.name
+                    }
+                }
+
+                // Insertar en Favorites
                 Favorites.insertIgnore {
                     it[Favorites.userId] = userId
-                    it[Favorites.gameId] = gameId
-
+                    it[Favorites.gameId] = req.gameId
+                    it[Favorites.coverUrl] = req.coverUrl
                 }
             }
 
@@ -40,19 +67,23 @@ fun Route.favoriteRoutes() {
             val principal = call.principal<JWTPrincipal>()!!
             val userId = principal.payload.getClaim("userId").asInt()
 
-            val games = transaction {
+            val favorites = transaction {
                 (Favorites innerJoin Games)
                     .select { Favorites.userId eq userId }
                     .map {
-                        mapOf(
-                            "id" to it[Games.id],
-                            "name" to it[Games.name]
+                        FavoriteResponse(
+                            id = it[Games.id],
+                            name = it[Games.name],
+                            coverUrl = it[Favorites.coverUrl]
                         )
                     }
             }
 
-            call.respond(games)
+
+            call.respond(favorites)
         }
+
+
 
     }
 }
