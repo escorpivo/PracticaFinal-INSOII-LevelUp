@@ -15,6 +15,8 @@ import GameDetailWrapper from "./Components/GameDetailWrapper";
 import Login from './Components/Login';
 import Register from './Components/Register';
 import Library from './Components/Library'; 
+import Favorites from './Components/Favorites';
+
 
 import {
   Box,
@@ -199,6 +201,29 @@ function AppContent() {
                 onLogout={handleLogout}
               >
                 <Library token={token} />
+              </MainLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            token ? (
+              <MainLayout
+                activeView={activeView}
+                setActiveView={setActiveView}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                selectedGenre={selectedGenre}
+                setSelectedGenre={setSelectedGenre}
+                selectedPlatform={selectedPlatform}
+                setSelectedPlatform={setSelectedPlatform}
+                onSearch={handleSearch}
+                onLogout={handleLogout}
+              >
+                <Favorites token={token} />
               </MainLayout>
             ) : (
               <Navigate to="/login" />

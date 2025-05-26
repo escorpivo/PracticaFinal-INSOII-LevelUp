@@ -35,6 +35,8 @@ import io.ktor.server.auth.Authentication
 import com.auth.SignupRequest
 import com.auth.LoginRequest
 import api.commentRoutes
+import api.favoriteRoutes
+
 
 
 
@@ -108,6 +110,7 @@ fun Application.module() {
         }
         //metodo para gestionar comentarios
         commentRoutes()
+        favoriteRoutes()
 
         // POST /signup
         post("/signup") {
