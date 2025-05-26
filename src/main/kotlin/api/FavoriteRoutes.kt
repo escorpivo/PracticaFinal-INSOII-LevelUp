@@ -3,17 +3,21 @@ package api
 
 import com.database.Favorites
 import com.database.Games
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.http.*
+
 
 fun Route.favoriteRoutes() {
 
@@ -83,6 +87,30 @@ fun Route.favoriteRoutes() {
             call.respond(favorites)
         }
 
+        // DELETE /favorites/{gameId}
+        delete("/favorites/{gameId}") {
+            // extraemos userId del token
+            val principal = call.principal<JWTPrincipal>()!!
+            val userId    = principal.payload.getClaim("userId").asInt()
+
+            // validamos parámetro
+            val gameId = call.parameters["gameId"]?.toLongOrNull()
+                ?: return@delete call.respond(HttpStatusCode.BadRequest, "gameId inválido")
+
+            // borramos
+            val deletedRows = transaction {
+                Favorites.deleteWhere { 
+                    (Favorites.userId eq userId) and 
+                    (Favorites.gameId eq gameId) 
+                }
+            }
+
+            if (deletedRows > 0) {
+                call.respond(HttpStatusCode.NoContent)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Favorito no encontrado")
+            }
+        }
 
 
     }
