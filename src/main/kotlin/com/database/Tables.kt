@@ -4,6 +4,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.ReferenceOption
+import java.time.LocalDateTime
 
 object Users : Table("users") {
     val id           = integer("id").autoIncrement()
@@ -57,4 +58,16 @@ object Favorites : Table() {
     val gameId = long("game_id").references(Games.id)
     val coverUrl = varchar("cover_url", 255)
     override val primaryKey = PrimaryKey(userId, gameId)
+}
+
+object Library : Table("library") {
+    val userId   = integer("user_id")
+      .references(Users.id, onDelete = ReferenceOption.CASCADE)
+    val gameId   = long("game_id")
+      .references(Games.id, onDelete = ReferenceOption.CASCADE)
+    val coverUrl = varchar("cover_url", 255)
+    val addedAt  = datetime("added_at")
+      .clientDefault { LocalDateTime.now() }   // ← Usa LocalDateTime
+
+    override val primaryKey = PrimaryKey(userId, gameId, name = "PK_Library_user_game")
 }
