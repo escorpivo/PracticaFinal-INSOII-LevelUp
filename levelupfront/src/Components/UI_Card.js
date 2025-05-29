@@ -12,9 +12,12 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }
   };
 
   const handleFavoriteClick = (e) => {
-    e.stopPropagation(); // Evita que se voltee al hacer clic en el corazón
+    e.stopPropagation();
     addToFavorites(id);
   };
+  console.log("Raw rating (0–100):", rating);
+
+  const starValue = Math.round((rating / 20) * 2) / 2;
 
   return (
     <div className={`card ${flipped ? "flipped" : ""}`} style={{ width: '18rem' }} onClick={handleFlip}>
@@ -35,7 +38,11 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }
           </div>
 
           <div className="rating">
-            <StarRating initialRating={Math.round(rating / 20)} size="5rem" />
+            <StarRating
+              initialRating={starValue}
+              readOnly={true}
+              size="1.5rem"
+            />
           </div>
         </>
       ) : (
