@@ -50,7 +50,10 @@ const TopNav = ({ onChangeView, onSearch  }) => {
                     <Button
                         color="inherit"
                         sx={{ fontWeight: "bold" }}
-                        onClick={() => onChangeView("settings")}
+                        onClick={() => {
+                            onChangeView("settings");
+                            navigate("/home");
+                        }}
                     >
                         Ajustes
                     </Button>
