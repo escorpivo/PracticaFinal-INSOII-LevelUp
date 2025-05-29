@@ -3,16 +3,19 @@ import "./UI-Card-style.css";
 import StarRating from "./StarRating";
 import IconButton from '@mui/material/IconButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }) => {
   const [flipped, setFlipped] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleFlip = () => {
     setFlipped(!flipped);
   };
 
   const handleFavoriteClick = (e) => {
-    e.stopPropagation(); // Evita que se voltee al hacer clic en el corazón
+    e.stopPropagation(); 
+    setIsFavorite(true); 
     addToFavorites(id);
   };
 
@@ -30,7 +33,7 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }
 
           <div className='favorite'>
             <IconButton onClick={handleFavoriteClick}>
-              <FavoriteBorderIcon />
+              {isFavorite ? <FavoriteIcon sx={{ color: 'red' }} /> : <FavoriteBorderIcon />}
             </IconButton>
           </div>
 
