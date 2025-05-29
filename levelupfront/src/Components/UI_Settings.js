@@ -35,32 +35,23 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
     });
   };
 
+  const handleClearCache = () => {
+    if (window.caches) { // Borrar caches del Service Worker si existen
+      caches.keys().then(names =>
+        names.forEach(name => caches.delete(name))
+      );
+    }
+    localStorage.clear(); // Borrar caches del Service Worker si existen
+    sessionStorage.clear();
+    window.location.reload();  // Recargar la página para aplicar cambios
+  };
+
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom fontWeight="bold" align="center">
         Ajustes
       </Typography>
 
-      <Card elevation={3} sx={{ borderRadius: 3, p: 2, mb: 4 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Idioma
-          </Typography>
-          <FormControl fullWidth>
-            <InputLabel id="language-select-label">Selecciona idioma</InputLabel>
-            <Select
-              labelId="language-select-label"
-              value={language}
-              label="Selecciona idioma"
-              onChange={(e) => setLanguage(e.target.value)}
-            >
-              <MenuItem value="es">Español</MenuItem>
-              <MenuItem value="en">Inglés</MenuItem>
-              <MenuItem value="fr">Francés</MenuItem>
-            </Select>
-          </FormControl>
-        </CardContent>
-      </Card>
 
       <Card elevation={3} sx={{ borderRadius: 3, p: 2, mb: 4 }}>
         <CardContent>
@@ -103,38 +94,20 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
       <Card elevation={3} sx={{ borderRadius: 3, p: 2 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Notificaciones
+            Caché de la aplicación
           </Typography>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={notifications}
-                onChange={() => setNotifications(!notifications)}
-              />
-            }
-            label="Recibir notificaciones por correo"
-          />
-          <Divider sx={{ my: 2 }} />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={autoUpdate}
-                onChange={() => setAutoUpdate(!autoUpdate)}
-              />
-            }
-            label="Permitir actualizaciones automáticas"
-          />
-        </CardContent>
-        <CardActions sx={{ justifyContent: "flex-end" }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Borra la caché local para liberar espacio y asegurar datos frescos.
+          </Typography>
           <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSave}
+            variant="outlined"
+            color="secondary"
+            onClick={handleClearCache}
             sx={{ borderRadius: 2, px: 4 }}
           >
-            Guardar cambios
+            Limpiar caché
           </Button>
-        </CardActions>
+        </CardContent>
       </Card>
     </Container>
   );
