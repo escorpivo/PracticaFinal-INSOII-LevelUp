@@ -58,3 +58,16 @@ object Favorites : Table() {
     val coverUrl = varchar("cover_url", 255)
     override val primaryKey = PrimaryKey(userId, gameId)
 }
+
+object Lists : Table("lists") {
+    val id = integer("id").autoIncrement()
+    val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
+    val name = varchar("name", 100)
+    override val primaryKey = PrimaryKey(id)
+}
+
+object ListItems : Table("list_items") {
+    val listId = integer("list_id").references(Lists.id, onDelete = ReferenceOption.CASCADE)
+    val gameId = long("game_id").references(Games.id, onDelete = ReferenceOption.CASCADE)
+    override val primaryKey = PrimaryKey(listId, gameId)
+}
