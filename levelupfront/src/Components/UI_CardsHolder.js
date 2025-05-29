@@ -3,30 +3,45 @@ import { Box, Grid } from "@mui/material";
 import Card from "./UI_Card";
 
 const baseUrl = window.location.hostname === "localhost"
-    ? "http://localhost:8080"
-    : "https://practicafinal-insoii-levelup.onrender.com";
+  ? "http://localhost:8080"
+  : "https://practicafinal-insoii-levelup.onrender.com";
 
-const CardsHolder = ({ darkMode, selectedGenre, selectedPlatform, games }) => {
-  // Función para marcar como favorito
+// Ahora recibimos favorites y toggleFavorite desde AppContent
+const CardsHolder = ({
+  darkMode,
+  selectedGenre,
+  selectedPlatform,
+  games,
+  favorites,
+  toggleFavorite,
+}) => {
+  console.log("Favorites en CardsHolder:", favorites);
+
+  // Función para marcar como favorito: hace POST y actualiza estado local
   const addToFavorites = async (gameId, name, coverUrl) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${baseUrl}/favorites`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        gameId,
-        name,
-        coverUrl: coverUrl || "/fallback.png"
-      })
-    });
-
-    if (!res.ok) throw new Error("Error al guardar favorito");
-    alert("¡Agregado a favoritos!");
+    try {
+      const res = await fetch(`${baseUrl}/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          gameId,
+          name,
+          coverUrl: coverUrl || "/fallback.png"
+        })
+      });
+      if (!res.ok) throw new Error("Error al guardar favorito");
+      // Actualizar estado en la UI
+      toggleFavorite(gameId);
+      alert("¡Agregado a favoritos!");
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo agregar a favoritos.");
+    }
   };
-
 
   // Filtrar juegos por género y plataforma
   const filteredGames = games.filter(game => {
@@ -56,6 +71,7 @@ const CardsHolder = ({ darkMode, selectedGenre, selectedPlatform, games }) => {
               rating={game.rating}
               darkMode={darkMode}
               addToFavorites={() => addToFavorites(game.id, game.name, game.coverUrl)}
+              isFavorite={favorites.includes(game.id)}
             />
           </Grid>
         ))}

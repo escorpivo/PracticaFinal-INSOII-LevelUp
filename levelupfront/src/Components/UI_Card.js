@@ -4,8 +4,9 @@ import "./UI-Card-style.css";
 import StarRating from "./StarRating";
 import IconButton from '@mui/material/IconButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
-export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }) => {
+export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, isFavorite, }) => {
   const [flipped, setFlipped] = useState(false);
 
   const handleFlip = () => {
@@ -43,8 +44,10 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }
               padding: '0.5rem 0'
             }}
           >
-            <IconButton onClick={handleFavoriteClick}>
-              <FavoriteBorderIcon />
+            <IconButton onClick={(e) => { e.stopPropagation(); addToFavorites(id); }}>
+              {isFavorite
+                ? <FavoriteIcon color="error" />
+                : <FavoriteBorderIcon />}    
             </IconButton>
             <StarRating
               initialRating={starValue}
