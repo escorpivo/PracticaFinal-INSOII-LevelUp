@@ -83,6 +83,7 @@ function AppContent() {
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark' : '';
@@ -116,6 +117,11 @@ function AppContent() {
     setToken('');
     navigate('/login');
   };
+  const toggleFavorite = (id) => {
+  setFavorites(prev =>
+    prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+  );
+};
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
@@ -147,6 +153,8 @@ function AppContent() {
                     selectedGenre={selectedGenre}
                     selectedPlatform={selectedPlatform}
                     games={games}
+                    favorites={favorites}
+                    toggleFavorite={toggleFavorite}
                   />
                 )}
                 {activeView === "settings" && (

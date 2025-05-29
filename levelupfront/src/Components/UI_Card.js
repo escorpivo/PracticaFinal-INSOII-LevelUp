@@ -1,10 +1,12 @@
+// File: UI_Card.js
 import React, { useState } from 'react';
 import "./UI-Card-style.css";
 import StarRating from "./StarRating";
 import IconButton from '@mui/material/IconButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
-export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }) => {
+export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, isFavorite, }) => {
   const [flipped, setFlipped] = useState(false);
 
   const handleFlip = () => {
@@ -12,9 +14,12 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }
   };
 
   const handleFavoriteClick = (e) => {
-    e.stopPropagation(); // Evita que se voltee al hacer clic en el corazón
+    e.stopPropagation();
     addToFavorites(id);
   };
+
+  // Convertir rating (0-100) a escala 0-5 con medio puntos
+  const starValue = Math.round((rating / 20) * 2) / 2;
 
   return (
     <div className={`card ${flipped ? "flipped" : ""}`} style={{ width: '18rem' }} onClick={handleFlip}>
@@ -28,14 +33,27 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }
             <h5>{nombre}</h5>
           </div>
 
-          <div className='favorite'>
-            <IconButton onClick={handleFavoriteClick}>
-              <FavoriteBorderIcon />
+          {/* Contenedor centrado para corazón y estrellas */}
+          <div
+            className="card-meta"
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '1.5rem',
+              padding: '0.5rem 0'
+            }}
+          >
+            <IconButton onClick={(e) => { e.stopPropagation(); addToFavorites(id); }}>
+              {isFavorite
+                ? <FavoriteIcon color="error" />
+                : <FavoriteBorderIcon />}    
             </IconButton>
-          </div>
-
-          <div className="rating">
-            <StarRating initialRating={Math.round(rating / 20)} size="5rem" />
+            <StarRating
+              initialRating={starValue}
+              readOnly={true}
+              size="1.5rem"
+            />
           </div>
         </>
       ) : (
