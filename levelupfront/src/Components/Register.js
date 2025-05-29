@@ -58,7 +58,10 @@ const Register = () => {
       alignItems="center"
       height="100vh"
       sx={{
-        background: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
+         backgroundImage: 'url(./portadaRegister.jpg)', 
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
       <Paper elevation={6} sx={{ p: 4, width: 400, borderRadius: 3 }}>
