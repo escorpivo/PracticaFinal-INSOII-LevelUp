@@ -1,3 +1,4 @@
+// File: UI_Card.js
 import React, { useState } from 'react';
 import "./UI-Card-style.css";
 import StarRating from "./StarRating";
@@ -15,8 +16,8 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }
     e.stopPropagation();
     addToFavorites(id);
   };
-  console.log("Raw rating (0–100):", rating);
 
+  // Convertir rating (0-100) a escala 0-5 con medio puntos
   const starValue = Math.round((rating / 20) * 2) / 2;
 
   return (
@@ -31,13 +32,20 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites }
             <h5>{nombre}</h5>
           </div>
 
-          <div className='favorite'>
+          {/* Contenedor centrado para corazón y estrellas */}
+          <div
+            className="card-meta"
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '1.5rem',
+              padding: '0.5rem 0'
+            }}
+          >
             <IconButton onClick={handleFavoriteClick}>
               <FavoriteBorderIcon />
             </IconButton>
-          </div>
-
-          <div className="rating">
             <StarRating
               initialRating={starValue}
               readOnly={true}
