@@ -12,6 +12,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.http.*
+import org.jetbrains.exposed.sql.insertAndGetId
 
 fun Route.listRoutes() {
 
@@ -56,7 +57,7 @@ fun Route.listRoutes() {
             val lists = transaction {
                 Lists.select { Lists.userId eq userId }
                     .map { row ->
-                        val listId = row[Lists.id]
+                        val listId = row[Lists.id].value
                         val games = (ListItems innerJoin Games)
                             .select { ListItems.listId eq listId }
                             .map {
