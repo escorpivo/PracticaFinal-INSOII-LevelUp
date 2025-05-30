@@ -100,4 +100,5 @@ fun Route.listRoutes() {
                 call.respond(result)
             }
         }
+    }
 }
