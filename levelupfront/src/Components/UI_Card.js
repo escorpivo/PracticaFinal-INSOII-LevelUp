@@ -6,9 +6,9 @@ import IconButton from '@mui/material/IconButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, isFavorite, }) => {
+export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, isFavorite }) => {
   const [flipped, setFlipped] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+
 
   const handleFlip = () => {
     setFlipped(!flipped);
@@ -45,10 +45,9 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, 
             }}
           >
             <IconButton onClick={(e) => { e.stopPropagation(); addToFavorites(id); }}>
-              {isFavorite
-                ? <FavoriteIcon color="error" />
-                : <FavoriteBorderIcon />}
+              {isFavorite ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
             </IconButton>
+
             <StarRating
               initialRating={starValue}
               readOnly={true}
