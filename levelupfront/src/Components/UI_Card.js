@@ -8,13 +8,13 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 
 export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, isFavorite, }) => {
   const [flipped, setFlipped] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleFlip = () => {
     setFlipped(!flipped);
   };
 
   const handleFavoriteClick = (e) => {
-    e.stopPropagation();
     addToFavorites(id);
   };
 
@@ -47,7 +47,7 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, 
             <IconButton onClick={(e) => { e.stopPropagation(); addToFavorites(id); }}>
               {isFavorite
                 ? <FavoriteIcon color="error" />
-                : <FavoriteBorderIcon />}    
+                : <FavoriteBorderIcon />}
             </IconButton>
             <StarRating
               initialRating={starValue}

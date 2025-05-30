@@ -4,6 +4,8 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.ReferenceOption
+import org.jetbrains.exposed.dao.id.*
+
 
 object Users : Table("users") {
     val id           = integer("id").autoIncrement()
@@ -57,4 +59,15 @@ object Favorites : Table() {
     val gameId = long("game_id").references(Games.id)
     val coverUrl = varchar("cover_url", 255)
     override val primaryKey = PrimaryKey(userId, gameId)
+}
+
+object Lists : IntIdTable("lists") {
+    val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
+    val name = varchar("name", 100)
+}
+
+object ListItems : Table("list_items") {
+    val listId = reference("list_id", Lists.id, onDelete = ReferenceOption.CASCADE)
+    val gameId = long("game_id").references(Games.id, onDelete = ReferenceOption.CASCADE)
+    override val primaryKey = PrimaryKey(listId, gameId)
 }

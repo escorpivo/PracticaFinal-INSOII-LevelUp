@@ -37,6 +37,7 @@ import com.auth.LoginRequest
 import api.commentRoutes
 import api.favoriteRoutes
 import api.ratingRoutes
+import api.listRoutes
 
 
 
@@ -162,6 +163,8 @@ fun Application.module() {
                 }
                 call.respond(HttpStatusCode.Created)
             }
+
+            listRoutes()
         }
 
 
