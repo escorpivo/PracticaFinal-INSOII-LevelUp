@@ -17,6 +17,7 @@ import Register from './Components/Register';
 import Library from './Components/Library'; 
 import Favorites from './Components/Favorites';
 import CustomListForm from "./Components/CustomListForm";
+import CustomListDetail from './Components/CustomListDetail';
 
 
 
@@ -249,6 +250,29 @@ function AppContent() {
                 onLogout={handleLogout}
               >
                 <CustomListForm token={token} />
+              </MainLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/lists/:id"
+          element={
+            token ? (
+              <MainLayout
+                activeView={activeView}
+                setActiveView={setActiveView}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                selectedGenre={selectedGenre}
+                setSelectedGenre={setSelectedGenre}
+                selectedPlatform={selectedPlatform}
+                setSelectedPlatform={setSelectedPlatform}
+                onSearch={handleSearch}
+                onLogout={handleLogout}
+              >
+                <CustomListDetail />
               </MainLayout>
             ) : (
               <Navigate to="/login" />
