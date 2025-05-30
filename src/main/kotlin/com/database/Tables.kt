@@ -34,6 +34,7 @@ object Ratings : Table("ratings") {
     val score   = integer("score").check { it.between(1, 5) }
 
     val gameName = text("gameName")
+    val coverUrl  = varchar("cover_url", 255).default("")
 
     init {
         uniqueIndex("UX_Ratings_User_Game", userId, gameId)
