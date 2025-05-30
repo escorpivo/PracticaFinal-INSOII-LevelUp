@@ -91,9 +91,11 @@ const Library = ({ token }) => {
               <Card>
                 <CardMedia
                   component="img"
-                  height="140"
+                  height="280"
+                  // ← aquí usamos coverUrl que manda el backend
                   image={game.coverUrl}
                   alt={game.name}
+                  sx={{ objectFit: 'cover' }}
                 />
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
