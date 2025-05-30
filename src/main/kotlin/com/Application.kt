@@ -38,6 +38,7 @@ import api.commentRoutes
 import api.favoriteRoutes
 import api.ratingRoutes
 import api.listRoutes
+import api.libraryRoutes
 
 
 
@@ -114,6 +115,8 @@ fun Application.module() {
         commentRoutes()
         favoriteRoutes()
         ratingRoutes()
+        listRoutes()
+        libraryRoutes()
 
         // POST /signup
         post("/signup") {

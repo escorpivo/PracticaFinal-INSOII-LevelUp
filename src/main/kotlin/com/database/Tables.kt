@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.dao.id.*
 
+import java.time.LocalDateTime
 
 object Users : Table("users") {
     val id           = integer("id").autoIncrement()
@@ -35,6 +36,7 @@ object Ratings : Table("ratings") {
     val score   = integer("score").check { it.between(1, 5) }
 
     val gameName = text("gameName")
+    val coverUrl  = varchar("cover_url", 255).default("")
 
     init {
         uniqueIndex("UX_Ratings_User_Game", userId, gameId)
@@ -70,4 +72,16 @@ object ListItems : Table("list_items") {
     val listId = reference("list_id", Lists.id, onDelete = ReferenceOption.CASCADE)
     val gameId = long("game_id").references(Games.id, onDelete = ReferenceOption.CASCADE)
     override val primaryKey = PrimaryKey(listId, gameId)
+}
+
+object Library : Table("library") {
+    val userId   = integer("user_id")
+      .references(Users.id, onDelete = ReferenceOption.CASCADE)
+    val gameId   = long("game_id")
+      .references(Games.id, onDelete = ReferenceOption.CASCADE)
+    val coverUrl = varchar("cover_url", 255)
+    val addedAt  = datetime("added_at")
+      .clientDefault { LocalDateTime.now() }
+
+    override val primaryKey = PrimaryKey(userId, gameId, name = "PK_Library_user_game")
 }

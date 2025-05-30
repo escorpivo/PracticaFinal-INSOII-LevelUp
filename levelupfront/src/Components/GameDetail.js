@@ -58,16 +58,15 @@ const GameDetail = ({ game }) => {
       await fetch(`${baseUrl}/ratings`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-            gameId:   game.id,
-            score:    newRating,
-            gameName: game.name
+          gameId: game.id,
+          score: newRating,
+          gameName: game.name
         }),
-        });
-
+      });
 
       // refrescamos la media (sin /api)
       const res = await fetch(
