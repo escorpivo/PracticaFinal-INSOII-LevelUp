@@ -16,60 +16,6 @@ const GameDetail = ({ game }) => {
   const token = localStorage.getItem('token');
   const loggedUserId = token ? jwtDecode(token).userId : null;
 
-  // -- Biblioteca ---
-  const [inLibrary, setInLibrary] = useState(false); // ← NUEVO
-
-  // Comprobar si ya está en biblioteca
-  useEffect(() => {
-    if (!game?.id || !token) return;
-    fetch(`${baseUrl}/library`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(list => {
-        // antes comparabas item.gameId, ahora tu API devuelve { id, name, coverUrl }
-        setInLibrary(list.some(item => item.id === game.id));
-      })
-      .catch(console.error);
-  }, [game?.id, token]);
-
-  // Toggle añadir/quitar de biblioteca
-  const toggleLibrary = async () => {
-    if (!token) {
-      alert('Tienes que iniciar sesión para usar la biblioteca');
-      return;
-    }
-    try {
-      if (!inLibrary) {
-        await fetch(`${baseUrl}/library`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            gameId: game.id,
-            name: game.name,
-            coverUrl: game.coverUrl,
-          }),
-        });
-        setInLibrary(true);
-      } else {
-        await fetch(`${baseUrl}/library/${game.id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setInLibrary(false);
-      }
-    } catch (err) {
-      console.error('Error actualizando biblioteca:', err);
-      alert('No se pudo actualizar tu biblioteca');
-    }
-  };
-  // ---
-
   // --- Estados para rating y comentarios ---
   const [average, setAverage] = useState(0);
   const [newRating, setNewRating] = useState(0);
@@ -116,8 +62,8 @@ const GameDetail = ({ game }) => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          gameId:   game.id,
-          score:    newRating,
+          gameId: game.id,
+          score: newRating,
           gameName: game.name
         }),
       });
@@ -345,17 +291,7 @@ const GameDetail = ({ game }) => {
         </Box>
       </Box>
 
-      {/* 3) AÑADIR/QUITAR DE BIBLIOTECA */}
-      <Box sx={{ ml: { md: '20%' }, mt: 3 }}>
-        <Button
-          variant={inLibrary ? 'contained' : 'outlined'}
-          onClick={toggleLibrary}
-        >
-          {inLibrary ? '✔ En Biblioteca' : 'Añadir a Biblioteca'}
-        </Button>
-      </Box>
-
-      {/* 4) AÑADIR COMENTARIO */}
+      {/* 3) AÑADIR COMENTARIO */}
       <Box sx={{ ml: { md: '20%' }, mt: 4 }}>
         <Typography variant="h6">Añadir comentario:</Typography>
         <TextField
