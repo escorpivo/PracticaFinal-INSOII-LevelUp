@@ -37,18 +37,22 @@ fun Route.listRoutes() {
         post("/lists/{listId}/add") {
             val listId = call.parameters["listId"]?.toIntOrNull()
                 ?: return@post call.respond(HttpStatusCode.BadRequest)
-            val body = call.receive<Map<String, Long>>()
-            val gameId = body["gameId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+
+            val body = call.receive<Map<String, List<Long>>>()
+            val gameIds = body["gameIds"] ?: return@post call.respond(HttpStatusCode.BadRequest)
 
             transaction {
-                ListItems.insertIgnore {
-                    it[ListItems.listId] = listId
-                    it[ListItems.gameId] = gameId
+                gameIds.forEach { gameId ->
+                    ListItems.insertIgnore {
+                        it[ListItems.listId] = listId
+                        it[ListItems.gameId] = gameId
+                    }
                 }
             }
 
             call.respond(HttpStatusCode.Created)
         }
+
 
         get("/lists") {
             val principal = call.principal<JWTPrincipal>()!!
@@ -68,6 +72,25 @@ fun Route.listRoutes() {
             }
 
             call.respond(lists)
+        }
+
+        get("/lists/{id}") {
+            val userId = call.principal<JWTPrincipal>()!!.payload.getClaim("userId").asInt()
+            val listId = call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
+
+            val list = transaction {
+                Lists.select { Lists.id eq listId and (Lists.userId eq userId) }
+                    .firstOrNull()
+                    ?.let { row ->
+                        val games = (ListItems innerJoin Games)
+                            .select { ListItems.listId eq listId }
+                            .map { mapOf("id" to it[Games.id], "name" to it[Games.name]) }
+                        mapOf("id" to row[Lists.id].value, "name" to row[Lists.name], "games" to games)
+                    }
+            }
+
+            if (list == null) call.respond(HttpStatusCode.NotFound)
+            else call.respond(list)
         }
     }
 }
