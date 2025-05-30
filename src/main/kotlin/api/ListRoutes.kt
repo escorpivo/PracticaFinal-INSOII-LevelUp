@@ -21,18 +21,30 @@ fun Route.listRoutes() {
         post("/lists") {
             val principal = call.principal<JWTPrincipal>()!!
             val userId = principal.payload.getClaim("userId").asInt()
-            val data = call.receive<Map<String, String>>()
-            val name = data["name"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+
+            val data = call.receive<Map<String, Any>>()
+            val name = data["name"] as? String ?: return@post call.respond(HttpStatusCode.BadRequest)
+            val gameIds = data["gameIds"] as? List<Int> ?: emptyList()
 
             val listId = transaction {
-                Lists.insertAndGetId {
+                val insertedId = Lists.insertAndGetId {
                     it[Lists.userId] = userId
                     it[Lists.name] = name
                 }.value
+
+                gameIds.forEach { gameId ->
+                    ListItems.insertIgnore {
+                        it[ListItems.listId] = insertedId
+                        it[ListItems.gameId] = gameId.toLong()
+                    }
+                }
+
+                insertedId
             }
 
-            call.respond(mapOf("listId" to listId))
+            call.respond(HttpStatusCode.Created, mapOf("listId" to listId))
         }
+
 
         post("/lists/{listId}/add") {
             val listId = call.parameters["listId"]?.toIntOrNull()
