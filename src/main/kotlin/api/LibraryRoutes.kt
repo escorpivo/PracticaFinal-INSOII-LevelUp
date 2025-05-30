@@ -9,16 +9,19 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import com.database.Games
 import com.database.Ratings
+import com.database.Favorites
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 
 @Serializable
 data class LibraryItemResponse(
   val id: Long,
   val name: String,
-  val score: Int
+  val score: Int,
+  val coverUrl: String       
 )
 
 @Serializable
@@ -36,13 +39,26 @@ fun Route.libraryRoutes() {
       val userId = principal.payload.getClaim("userId").asInt()
 
       val items = transaction {
-        (Ratings innerJoin Games)
-          .select { Ratings.userId eq userId }
+        // JOIN de Ratings, Games y Favorites
+        (Ratings innerJoin Games innerJoin Favorites)
+          .slice(
+            Games.id,
+            Games.name,
+            Ratings.score,
+            Favorites.coverUrl
+          )
+          .select { 
+            // sólo las filas de este usuario
+            (Ratings.userId eq userId) and 
+            (Favorites.userId eq userId) and 
+            (Favorites.gameId eq Games.id)
+          }
           .map { row ->
             LibraryItemResponse(
-              id    = row[Games.id],
-              name  = row[Games.name],
-              score = row[Ratings.score]
+              id       = row[Games.id],
+              name     = row[Games.name],
+              score    = row[Ratings.score],
+              coverUrl = row[Favorites.coverUrl]   
             )
           }
       }
@@ -50,24 +66,27 @@ fun Route.libraryRoutes() {
       call.respond(items)
     }
 
-    // 2) AÑADIR a la biblioteca (si no existe, crea un rating "dummy" de 1)
+    // 2) AÑADIR a la biblioteca
     post("/library") {
       val principal = call.principal<JWTPrincipal>()!!
       val userId = principal.payload.getClaim("userId").asInt()
       val req = call.receive<LibraryAddRequest>()
 
       transaction {
-        // Asegura que el juego exista en la tabla Games
         Games.insertIgnore {
           it[id]   = req.gameId
           it[name] = req.gameName
         }
-        // Inserta un rating por defecto de 1 (o ignora si ya existe)
         Ratings.insertIgnore {
-          it[Ratings.userId]   = userId
-          it[Ratings.gameId]   = req.gameId
-          it[Ratings.score]    = 1
-          it[Ratings.gameName] = req.gameName
+          it[Ratings.userId] = userId
+          it[Ratings.gameId] = req.gameId
+          it[score]          = 1
+          it[gameName]       = req.gameName
+        }
+        Favorites.insertIgnore {
+          it[Favorites.userId]   = userId
+          it[Favorites.gameId]   = req.gameId
+          it[Favorites.coverUrl]  = req.gameName 
         }
       }
 
@@ -78,21 +97,18 @@ fun Route.libraryRoutes() {
     delete("/library/{gameId}") {
       val principal = call.principal<JWTPrincipal>()!!
       val userId = principal.payload.getClaim("userId").asInt()
-      val gameId = call.parameters["gameId"]?.toLongOrNull()
-        ?: return@delete call.respond(HttpStatusCode.BadRequest, "gameId inválido")
+      val gameId = call.parameters["gameId"]!!.toLong()
 
-      val deleted = transaction {
+      transaction {
         Ratings.deleteWhere { 
-          (Ratings.userId eq userId) and 
-          (Ratings.gameId eq gameId) 
+          (Ratings.userId eq userId) and (Ratings.gameId eq gameId)
+        }
+        Favorites.deleteWhere {
+          (Favorites.userId eq userId) and (Favorites.gameId eq gameId)
         }
       }
 
-      if (deleted > 0) {
-        call.respond(HttpStatusCode.NoContent)
-      } else {
-        call.respond(HttpStatusCode.NotFound, "No estaba en tu biblioteca")
-      }
+      call.respond(HttpStatusCode.NoContent)
     }
   }
 }
