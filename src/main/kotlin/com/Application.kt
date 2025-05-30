@@ -114,7 +114,6 @@ fun Application.module() {
         commentRoutes()
         favoriteRoutes()
         ratingRoutes()
-        listRoutes()
 
         // POST /signup
         post("/signup") {
@@ -164,6 +163,8 @@ fun Application.module() {
                 }
                 call.respond(HttpStatusCode.Created)
             }
+
+            listRoutes()
         }
 
 

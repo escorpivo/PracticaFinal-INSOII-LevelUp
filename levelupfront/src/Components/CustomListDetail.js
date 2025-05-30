@@ -20,14 +20,31 @@ const CustomListDetail = () => {
   useEffect(() => {
     const fetchList = async () => {
       try {
+
+        if (!id) {
+  console.error("ID de la lista no definido");
+  return;
+}
+
         const token = localStorage.getItem("token");
+        console.log("TOKEN:", token); 
+
         const res = await fetch(`${baseUrl}/lists/${id}`, {
-        headers: {
+          headers: {
             Authorization: `Bearer ${token}`,
-        },
+            Accept: "application/json"
+          }
         });
 
-        if (!res.ok) throw new Error("Error al cargar lista");
+        if (!token) {
+            console.error("No hay token disponible");
+            return;
+        }
+
+        const contentType = res.headers.get("content-type");
+        if (!res.ok || !contentType || !contentType.includes("application/json")) {
+          throw new Error("Respuesta no válida del servidor");
+        }
 
         const data = await res.json();
         setList(data);

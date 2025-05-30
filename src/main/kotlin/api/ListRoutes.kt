@@ -75,22 +75,29 @@ fun Route.listRoutes() {
         }
 
         get("/lists/{id}") {
-            val userId = call.principal<JWTPrincipal>()!!.payload.getClaim("userId").asInt()
-            val listId = call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val principal = call.principal<JWTPrincipal>()!!
+            val userId = principal.payload.getClaim("userId").asInt()
 
-            val list = transaction {
-                Lists.select { Lists.id eq listId and (Lists.userId eq userId) }
-                    .firstOrNull()
-                    ?.let { row ->
-                        val games = (ListItems innerJoin Games)
-                            .select { ListItems.listId eq listId }
-                            .map { mapOf("id" to it[Games.id], "name" to it[Games.name]) }
-                        mapOf("id" to row[Lists.id].value, "name" to row[Lists.name], "games" to games)
+            val listId = call.parameters["id"]?.toIntOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest)
+
+            val result = transaction {
+                val list = Lists.select { (Lists.id eq listId) and (Lists.userId eq userId) }
+                    .singleOrNull() ?: return@transaction null
+
+                val games = (ListItems innerJoin Games)
+                    .select { ListItems.listId eq listId }
+                    .map {
+                        mapOf("id" to it[Games.id], "name" to it[Games.name])
                     }
+
+                mapOf("id" to list[Lists.id].value, "name" to list[Lists.name], "games" to games)
             }
 
-            if (list == null) call.respond(HttpStatusCode.NotFound)
-            else call.respond(list)
+            if (result == null) {
+                call.respond(HttpStatusCode.NotFound, "Lista no encontrada")
+            } else {
+                call.respond(result)
+            }
         }
-    }
 }
