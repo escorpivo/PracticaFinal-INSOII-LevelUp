@@ -29,9 +29,11 @@ import {
   LinearProgress
 } from "@mui/material";
 
-const baseUrl = window.location.hostname === "localhost"
-  ? "http://localhost:8080"
-  : "https://practicafinal-insoii-levelup.onrender.com";
+const isLocal = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname);
+const baseUrl = isLocal
+    ? "http://localhost:8080"
+    : "https://practicafinal-insoii-levelup.onrender.com";
+
 
 function MainLayout(props) {
   const {
@@ -74,6 +76,7 @@ function AppContent() {
   const navigate = useNavigate();
   const [games, setGames] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(0);
   const [activeView, setActiveView] = useState("cards");
   const [darkMode, setDarkMode] = useState(() => {
     const stored = localStorage.getItem("darkMode");
@@ -97,18 +100,27 @@ function AppContent() {
   }, [darkMode]);
 
   useEffect(() => {
+    if (searchQuery.trim() !== "") {
+      setPage(0);
+    }
+  }, [searchQuery]);
+
+
+//Este efecto solo depende de `page` para cargar los juegos
+  useEffect(() => {
     const fetchGames = async () => {
       try {
-        const res = await fetch(`${baseUrl}/games`);
+        const res = await fetch(`${baseUrl}/games?page=${page}`);
         if (!res.ok) throw new Error("Error al cargar juegos");
         const data = await res.json();
+
         setGames(data);
       } catch (err) {
         console.error("Error al cargar juegos:", err);
       }
     };
     fetchGames();
-  }, [searchQuery]);
+  }, [page]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -152,12 +164,15 @@ function AppContent() {
               >
                 {activeView === "cards" && (
                   <CardsHolder
+                    key={`page-${page}`}
                     darkMode={darkMode}
                     selectedGenre={selectedGenre}
                     selectedPlatform={selectedPlatform}
                     games={games}
                     favorites={favorites}
                     toggleFavorite={toggleFavorite}
+                    page={page}
+                    setPage={setPage}
                   />
                 )}
                 {activeView === "settings" && (
@@ -188,7 +203,7 @@ function AppContent() {
                 onSearch={handleSearch}
                 onLogout={handleLogout}
               >
-                <GameDetailWrapper />
+                <GameDetailWrapper games={games} />
               </MainLayout>
             ) : (
               <Navigate to="/login" />

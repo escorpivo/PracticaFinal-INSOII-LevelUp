@@ -39,7 +39,7 @@ import api.favoriteRoutes
 import api.ratingRoutes
 import api.listRoutes
 import api.libraryRoutes
-
+import com.api.gameRoutes
 
 
 
@@ -106,11 +106,10 @@ fun Application.module() {
     }
 
     routing {
-        // ruta para obtener los juegos, de la función fetchGames de IGDBClient
-        get("/games") {
-            val games = igdbClient.fetchGamesCached()
-            call.respond(games)
-        }
+
+        // Rutas de juegos (paginado + por ID)
+        gameRoutes(igdbClient)
+
         //metodo para gestionar comentarios
         commentRoutes()
         favoriteRoutes()

@@ -54,52 +54,60 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
 
 
     // Cacheamos temporalmente los juegos de IGDB para evitar peticiones repetidas y reducir la latencia.
-    // TTL actual: 60 segundos. Suficiente para evitar sobrecargar la API y mejorar tiempos de respuesta.
-    private var cachedGames: List<Game>? = null
-    private var lastFetch: Long = 0L
+    // TTL actual: 60 segundos. Suficiente para evitar sobreºcargar la API y mejorar tiempos de respuesta.
+    private val cachedPages = mutableMapOf<Int, List<Game>>()
+    private val lastFetches = mutableMapOf<Int, Long>()
 
-    suspend fun fetchGamesCached(): List<Game> {
+    suspend fun fetchGamesCached(page: Int): List<Game> {
+
         val now = System.currentTimeMillis()
-        return if (cachedGames != null && now - lastFetch < 60_000) {
-            cachedGames!!
-        } else {
-            val freshGames = fetchGames() // original
-            cachedGames = freshGames
-            lastFetch = now
-            freshGames
+
+        if (cachedPages.containsKey(page) && now - (lastFetches[page] ?: 0) < 60_000) {
+            return cachedPages[page]!!
         }
+
+        val freshGames = fetchGames(page)
+        cachedPages[page] = freshGames
+        lastFetches[page] = now
+        return freshGames
     }
 
+
     // obtenemos los juegos desde IGDB haciendo petición al endpoint /games
-    suspend fun fetchGames(): List<Game> {
+    suspend fun fetchGames(page: Int): List<Game> = coroutineScope {
         authorize()
 
         val finalGames = mutableListOf<Game>()
-        var offset = 0
-        val requestLimit = 10
+        var offset = page * 24
+        val batchSize = 8
 
         while (finalGames.size < 24) {
             val gamesJson: String = httpClient.post("https://api.igdb.com/v4/games") {
                 header("Client-ID", clientId)
                 header("Authorization", "Bearer $accessToken")
                 contentType(ContentType.Application.Json)
-                setBody("fields id, name, storyline, rating, url, cover, platforms, genres; where cover != null; sort rating desc; limit $requestLimit; offset $offset;")
+                setBody("""
+                fields id, name, storyline, rating, url, cover, platforms, genres;
+                where cover != null & rating != null;
+                sort rating desc;
+                limit $batchSize;
+                offset $offset;
+            """.trimIndent())
             }.body()
 
             val gamesBatch = json.decodeFromString(ListSerializer(serializer<Game>()), gamesJson)
 
-            if (gamesBatch.isEmpty()) break // Fin de datos
+            if (gamesBatch.isEmpty()) break
 
             val coverIds = gamesBatch.mapNotNull { it.cover }
             val platformIds = gamesBatch.flatMap { it.platforms ?: emptyList() }.distinct()
             val genreIds = gamesBatch.flatMap { it.genres ?: emptyList() }.distinct()
 
-            val (coverUrls, platformNames, genreNames) = coroutineScope {
-                val coverDeferred = if (coverIds.isNotEmpty()) async { fetchCovers(coverIds) } else async { emptyMap() }
-                val platformDeferred = if (platformIds.isNotEmpty()) async { fetchPlatforms(platformIds) } else async { emptyMap() }
-                val genreDeferred = if (genreIds.isNotEmpty()) async { fetchGenres(genreIds) } else async { emptyMap() }
-                awaitAll(coverDeferred, platformDeferred, genreDeferred)
-            }
+            val (coverUrls, platformNames, genreNames) = awaitAll(
+                async { fetchCovers(coverIds) },
+                async { fetchPlatforms(platformIds) },
+                async { fetchGenres(genreIds) }
+            )
 
             val validGames = gamesBatch.mapNotNull { game ->
                 val url = coverUrls[game.cover]
@@ -116,19 +124,16 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
                 } else null
             }
 
-            for (game in validGames) {
-                if (finalGames.size >= 24) break
-                finalGames += game
-            }
+            finalGames += validGames
+            offset += batchSize
 
-
-            println("Offset procesado: $offset | Juegos válidos acumulados: ${finalGames.size}")
-            offset += gamesBatch.size
-
+            println("Página $page → Offset procesado: $offset | Juegos válidos acumulados: ${finalGames.size}")
         }
 
-        return finalGames.take(24)
+        return@coroutineScope finalGames.take(24)
     }
+
+
 
 
     // Hacemos petición al endpoint /covers para buscar las imágenes que usaremos en las tarjetas de los juegos
@@ -180,6 +185,60 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         val genreList = Json.decodeFromString(ListSerializer(serializer<Genre>()), response)
 
         return genreList.associateBy({ it.id }, { it.name })
+    }
+
+
+
+    //función para solicitar Juegos de manera individual
+    suspend fun fetchGameById(id: Int): Game? = coroutineScope {
+        authorize()
+
+        // 1. Consulta el juego por ID
+        val gameJson: String = httpClient.post("https://api.igdb.com/v4/games") {
+            header("Client-ID", clientId)
+            header("Authorization", "Bearer $accessToken")
+            contentType(ContentType.Application.Json)
+            setBody("""
+            fields id, name, storyline, rating, url, cover, platforms, genres;
+            where id = $id;
+        """.trimIndent())
+        }.body()
+
+        val games = Json.decodeFromString(ListSerializer(serializer<Game>()), gameJson)
+        val game = games.firstOrNull() ?: return@coroutineScope null
+
+        // 2. Fetch de covers, plataformas y géneros
+        val coverDeferred = async {
+            game.cover?.let { fetchCovers(listOf(it)) } ?: emptyMap()
+        }
+
+        val platformDeferred = async {
+            game.platforms?.let { fetchPlatforms(it) } ?: emptyMap()
+        }
+
+        val genreDeferred = async {
+            game.genres?.let { fetchGenres(it) } ?: emptyMap()
+        }
+
+        val (coverUrls, platformNames, genreNames) = awaitAll(
+            coverDeferred, platformDeferred, genreDeferred
+        )
+
+        // 3. Construcción del objeto Game con información
+        val url = game.cover?.let { coverUrls[it] }
+
+        // si no hay cover, lo descartamos, esto alomejor lo quito
+        if (url == null) return@coroutineScope null
+
+        val platformNamesList = game.platforms?.mapNotNull { platformNames[it] } ?: listOf("Desconocida")
+        val genreNamesList = game.genres?.mapNotNull { genreNames[it] } ?: listOf("Sin género")
+
+        return@coroutineScope game.copy(
+            coverUrl = url,
+            platform = platformNamesList.firstOrNull() ?: "Desconocida",
+            platformNames = platformNamesList,
+            genreNames = genreNamesList
+        )
     }
 
 
