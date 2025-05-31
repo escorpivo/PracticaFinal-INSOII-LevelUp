@@ -40,6 +40,7 @@ import api.ratingRoutes
 import api.listRoutes
 import api.libraryRoutes
 import com.api.gameRoutes
+import api.reviewsRoutes
 
 
 
@@ -167,6 +168,7 @@ fun Application.module() {
             }
 
             listRoutes()
+            reviewsRoutes()
         }
 
 

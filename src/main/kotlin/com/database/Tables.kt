@@ -5,8 +5,8 @@ import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.dao.id.*
-
 import java.time.LocalDateTime
+import org.jetbrains.exposed.sql.Table
 
 object Users : Table("users") {
     val id           = integer("id").autoIncrement()
@@ -21,6 +21,7 @@ object Games : Table("games") {
     val id = long("id")
     override val primaryKey = PrimaryKey(id, name = "PK_Games_Id")
     val name = text("name")
+    val coverUrl = varchar("cover_url", 500).default("")
 }
 
 object Ratings : Table("ratings") {
