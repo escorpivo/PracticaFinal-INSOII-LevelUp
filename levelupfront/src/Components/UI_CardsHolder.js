@@ -37,10 +37,8 @@ const CardsHolder = ({
       if (!res.ok) throw new Error("Error al guardar favorito");
       // Actualizar estado en la UI
       toggleFavorite(gameId);
-      alert("¡Agregado a favoritos!");
     } catch (error) {
       console.error(error);
-      alert("No se pudo agregar a favoritos.");
     }
   };
 
