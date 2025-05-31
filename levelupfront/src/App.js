@@ -126,6 +126,8 @@ function AppContent() {
   useEffect(() => {
     const fetchGames = async () => {
       try {
+        setLoading(true);
+
         const res = await fetch(`${baseUrl}/games?page=${page}`);
         if (!res.ok) throw new Error("Error al cargar juegos");
         const data = await res.json();
@@ -133,6 +135,8 @@ function AppContent() {
         setGames(data);
       } catch (err) {
         console.error("Error al cargar juegos:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchGames();
