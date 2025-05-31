@@ -5,9 +5,11 @@ import StarRating from "./StarRating";
 import IconButton from '@mui/material/IconButton';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { useNavigate } from 'react-router-dom';
 
 export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, isFavorite }) => {
   const [flipped, setFlipped] = useState(false);
+  const navigate = useNavigate();
 
 
   const handleFlip = () => {
@@ -65,14 +67,14 @@ export const Card = ({ id, nombre, descripcion, imagen, rating, addToFavorites, 
             </div>
 
             <button
-              className="card-info-button"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = `/game/${id}`;
-              }}
-            >
+                className="card-info-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/game/${id}`);
+                }}>
               Más info aquí
             </button>
+
           </div>
         </div>
       )}

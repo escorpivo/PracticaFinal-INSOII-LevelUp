@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Button } from "@mui/material";
 import Card from "./UI_Card";
 
 const baseUrl = window.location.hostname === "localhost"
@@ -14,8 +14,9 @@ const CardsHolder = ({
   games,
   favorites,
   toggleFavorite,
+  page,
+  setPage
 }) => {
-  console.log("Favorites en CardsHolder:", favorites);
 
   // Función para marcar como favorito: hace POST y actualiza estado local
   const addToFavorites = async (gameId, name, coverUrl) => {
@@ -58,6 +59,7 @@ const CardsHolder = ({
     return matchesGenre && matchesPlatform;
   });
 
+
   return (
     <Box p={4}>
       <Grid container spacing={2}>
@@ -76,6 +78,24 @@ const CardsHolder = ({
           </Grid>
         ))}
       </Grid>
+
+      <Box display="flex" justifyContent="center" gap={2} mt={4}>
+        <Button
+            variant="outlined"
+            onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+            disabled={page === 0}
+        >
+          ← Anterior
+        </Button>
+        <Button
+            variant="outlined"
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={games.length < 24}
+        >
+          Siguiente →
+        </Button>
+      </Box>
+
     </Box>
   );
 };
