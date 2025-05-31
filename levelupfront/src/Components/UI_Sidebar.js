@@ -15,6 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from '@mui/icons-material/Logout';
+
 import { useNavigate } from 'react-router-dom';
 
 
@@ -58,11 +59,13 @@ const PLATFORM_LIST = [
 ];
 
 const Sidebar = ({
-  selectedGenre,
+
+ selectedGenre,
   onGenreChange,
   selectedPlatform,
   onPlatformChange,
   onLogout
+
 }) => {
   const [genreAnchorEl, setGenreAnchorEl] = useState(null);
   const [platformAnchorEl, setPlatformAnchorEl] = useState(null);
@@ -169,17 +172,21 @@ const Sidebar = ({
 
       <Divider sx={{ width: "100%", my: 1 }} />
 
-      {/* Otros iconos decorativos */}
+      {/*Categoria*/}
       <Box width="100%" display="flex" alignItems="center" gap={1}>
         <IconButton><CategoryIcon /></IconButton>
         {isExpanded && <Typography variant="body2">Categoría</Typography>}
       </Box>
+
+      {/*Favoritos*/}
       <Box width="100%" display="flex" alignItems="center" gap={1}>
         <IconButton onClick={() => navigate('/favorites')} title="Ir a favoritos">
           <StarIcon />
         </IconButton>
         {isExpanded && <Typography variant="body2">Favoritos</Typography>}
       </Box>
+
+      {/*añadir*/}
       <Box width="100%" display="flex" alignItems="center" gap={1}>
         <IconButton><AddIcon /></IconButton>
         {isExpanded && <Typography variant="body2">Añadir</Typography>}
