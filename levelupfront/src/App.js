@@ -18,6 +18,7 @@ import Library from './Components/Library';
 import Favorites from './Components/Favorites';
 import CustomListForm from "./Components/CustomListForm";
 import CustomListDetail from './Components/CustomListDetail';
+import Reviews from './Components/Reviews';
 
 
 
@@ -378,6 +379,29 @@ function AppContent() {
                 onLogout={handleLogout}
               >
                 <CustomListDetail />
+              </MainLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/reviews"
+          element={
+            token ? (
+              <MainLayout
+                activeView={activeView}
+                setActiveView={setActiveView}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                selectedGenre={selectedGenre}
+                setSelectedGenre={setSelectedGenre}
+                selectedPlatform={selectedPlatform}
+                setSelectedPlatform={setSelectedPlatform}
+                onSearch={handleSearch}
+                onLogout={handleLogout}
+              >
+                <Reviews token={token} />
               </MainLayout>
             ) : (
               <Navigate to="/login" />
