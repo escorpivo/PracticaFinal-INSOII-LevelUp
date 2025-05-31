@@ -1,36 +1,58 @@
-import React, { useState } from "react";
-import { Box, TextField, InputAdornment, IconButton } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {Box, TextField, InputAdornment, IconButton, Typography, Slide} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
+import HomeIcon from '@mui/icons-material/Home';
 
-const SearchBar = ({ onSearch }) => {
-    const [query, setQuery] = useState("");
+
+const SearchBar = ({ onSearch, searchQuery, resetToHome }) => {
+    const [input, setInput] = useState("");
 
     const handleSearch = () => {
-        if (query.trim() !== "") {
+        const query = input.trim();
+        if (query !== "") {
             onSearch(query);
+            setInput("");
         }
     };
 
-    const handleKeyPress = (e) => {
+    const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             handleSearch();
         }
     };
 
+    useEffect(() => {
+        if (!searchQuery) setInput("");
+    }, [searchQuery]);
+
     return (
-        <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            width="100%"
-            padding={2}
-        >
+        <Box display="flex" alignItems="center" gap={1}>
+            <Slide direction="left" in={Boolean(searchQuery)} mountOnEnter unmountOnExit>
+                <Box
+                    onClick={resetToHome}
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        cursor: "pointer",
+                        userSelect: "none",
+                    }}
+                >
+                    <IconButton size="small">
+                        <HomeIcon />
+                    </IconButton>
+                    <Typography variant="caption" sx={{ mt: -1 }}>
+                        Volver
+                    </Typography>
+                </Box>
+            </Slide>
+
             <TextField
                 variant="outlined"
                 placeholder="Buscar..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyPress={handleKeyPress}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
                 sx={{
                     width: "400px",
                     backgroundColor: "background.paper",
