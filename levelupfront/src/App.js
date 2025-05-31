@@ -31,8 +31,8 @@ import {
 
 const isLocal = ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname);
 const baseUrl = isLocal
-    ? "http://localhost:8080"
-    : "https://practicafinal-insoii-levelup.onrender.com";
+  ? "http://localhost:8080"
+  : "https://practicafinal-insoii-levelup.onrender.com";
 
 
 function MainLayout(props) {
@@ -86,10 +86,10 @@ function AppContent() {
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(() => localStorage.getItem('token') || '');
+  const [favorites, setFavorites] = useState([]);
 
   const darkTheme = createTheme({ palette: { mode: 'dark' } });
   const lightTheme = createTheme({ palette: { mode: 'light' } });
-  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark' : '';
@@ -105,8 +105,24 @@ function AppContent() {
     }
   }, [searchQuery]);
 
+  // Cargar favoritos al iniciar
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-//Este efecto solo depende de `page` para cargar los juegos
+    fetch(`${baseUrl}/favorites`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const favoriteIds = data.map(f => f.id);
+        setFavorites(favoriteIds);
+      })
+
+      .catch((err) => console.error("Error al cargar favoritos:", err));
+  }, [token]);
+
+  // Cargar juegos
   useEffect(() => {
     const fetchGames = async () => {
       try {
@@ -132,11 +148,51 @@ function AppContent() {
     setToken('');
     navigate('/login');
   };
-  const toggleFavorite = (id) => {
-  setFavorites(prev =>
-    prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-  );
-};
+
+  const toggleFavorite = async (gameId) => {
+    const isFav = favorites.includes(gameId);
+
+    try {
+      if (isFav) {
+        // eliminar favorito
+        const res = await fetch(`${baseUrl}/favorites/${gameId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Error al eliminar favorito");
+
+        setFavorites((prev) => prev.filter((id) => id !== gameId));
+
+      } else {
+        // añadir favorito
+        const game = games.find((g) => g.id === gameId);
+        if (!game) throw new Error("Juego no encontrado");
+
+        const res = await fetch(`${baseUrl}/favorites`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            gameId: game.id,
+            name: game.name,
+            coverUrl: game.coverUrl || "/fallback.png",
+          }),
+        });
+
+        if (!res.ok) throw new Error("Error al añadir favorito");
+
+        setFavorites((prev) => [...prev, gameId]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
