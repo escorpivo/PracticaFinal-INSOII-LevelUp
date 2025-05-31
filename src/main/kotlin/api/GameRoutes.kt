@@ -30,5 +30,20 @@ fun Route.gameRoutes(igdbClient: IGDBClient) {
                 call.respond(HttpStatusCode.NotFound, "Juego no encontrado")
             }
         }
+
+
+        get("/search") {
+            val query = call.request.queryParameters["query"]?.trim()
+            if (query.isNullOrBlank()) {
+                call.respond(HttpStatusCode.BadRequest, "Falta el parámetro de búsqueda")
+                return@get
+            }
+
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 0
+            val resultados = igdbClient.searchGamesByName(query, page)
+
+            call.respond(resultados)
+        }
+
     }
 }
