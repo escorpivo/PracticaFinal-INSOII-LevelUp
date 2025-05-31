@@ -52,7 +52,7 @@ dependencies {
 
     // Esto es para la parte de testing
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$kotlin_version")
 
 
     //implementacion del .env
@@ -71,6 +71,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt:2.x.x")
     implementation("com.auth0:java-jwt:4.x.x")
 
+    testImplementation("com.h2database:h2:2.2.224")
 }
 
 // Configuración del ShadowJar proporcionado por el plugin de Ktor
@@ -84,8 +85,15 @@ tasks {
 
 // Deshabilito los tests temporalmente
 tasks.test {
-    enabled = true
+    useJUnitPlatform()
+
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showStandardStreams = true
+    }
 }
+
 
 // Tarea para copiar el frontend compilado al directorio de recursos de Ktor
 tasks.register<Copy>("copyFrontend") {

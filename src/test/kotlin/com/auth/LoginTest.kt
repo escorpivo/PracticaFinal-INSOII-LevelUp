@@ -16,8 +16,11 @@ class AuthRoutesTest {
             module() 
         }
 
-        val testEmail = "testuser@example.com"
-        val testUsername = "testuser"
+        //cada vez que se ejecute el test, se genera un email y user random
+        val timestamp = System.currentTimeMillis()
+        val testUsername = "testuser_$timestamp"
+        val testEmail = "user_$timestamp@example.com"
+
         val testPassword = "testpassword"
 
         // 🔹 Register
