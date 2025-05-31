@@ -48,6 +48,8 @@ function MainLayout(props) {
     setSelectedPlatform,
     onSearch,
     onLogout,
+    resetToHome,
+    searchQuery,
   } = props;
 
   return (
@@ -57,6 +59,8 @@ function MainLayout(props) {
         darkMode={darkMode}
         setDarkMode={setDarkMode}
         onSearch={onSearch}
+        resetToHome={resetToHome}
+        searchQuery={searchQuery}
       />
       <Box display="flex" flexGrow={1}>
         <Sidebar
@@ -65,6 +69,7 @@ function MainLayout(props) {
           selectedPlatform={selectedPlatform}
           onPlatformChange={setSelectedPlatform}
           onLogout={onLogout}
+          resetToHome={resetToHome}
         />
         <Box sx={{ flexGrow: 1, overflow: "auto" }}>{children}</Box>
       </Box>
@@ -128,10 +133,14 @@ function AppContent() {
       try {
         setLoading(true);
 
-        const res = await fetch(`${baseUrl}/games?page=${page}`);
-        if (!res.ok) throw new Error("Error al cargar juegos");
-        const data = await res.json();
+        const url = searchQuery.trim()
+            ? `${baseUrl}/games/search?query=${encodeURIComponent(searchQuery)}&page=${page}`
+            : `${baseUrl}/games?page=${page}`;
 
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Error al cargar juegos");
+
+        const data = await res.json();
         setGames(data);
       } catch (err) {
         console.error("Error al cargar juegos:", err);
@@ -139,13 +148,24 @@ function AppContent() {
         setLoading(false);
       }
     };
+
     fetchGames();
-  }, [page]);
+  }, [page, searchQuery]);
+
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+    setPage(0);
     setActiveView("cards");
   };
+
+  //para volver a la página 1, con la búsqueda inicial.
+  const resetToHome = () => {
+    setSearchQuery("");
+    setPage(0);
+    setActiveView("cards");
+  };
+
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -221,6 +241,8 @@ function AppContent() {
                 setSelectedPlatform={setSelectedPlatform}
                 onSearch={handleSearch}
                 onLogout={handleLogout}
+                resetToHome={resetToHome}
+                searchQuery={searchQuery}
               >
                 {activeView === "cards" && (
                   <CardsHolder

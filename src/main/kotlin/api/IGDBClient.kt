@@ -127,7 +127,6 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
             finalGames += validGames
             offset += batchSize
 
-            println("Página $page → Offset procesado: $offset | Juegos válidos acumulados: ${finalGames.size}")
         }
 
         return@coroutineScope finalGames.take(30)
@@ -240,6 +239,67 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
             genreNames = genreNamesList
         )
     }
+
+
+
+    //Fución de búsqueda de juegos
+    suspend fun searchGamesByName(query: String, page: Int): List<Game> = coroutineScope {
+        authorize()
+
+        val finalGames = mutableListOf<Game>()
+        var offset = page * 30
+        val batchSize = 10
+
+        while (finalGames.size < 30) {
+            val gamesJson: String = httpClient.post("https://api.igdb.com/v4/games") {
+                header("Client-ID", clientId)
+                header("Authorization", "Bearer $accessToken")
+                contentType(ContentType.Application.Json)
+                setBody("""
+                fields id, name, storyline, rating, url, cover, platforms, genres;
+                where name ~ *"$query"* & cover != null & rating != null;
+                sort rating desc;
+                limit $batchSize;
+                offset $offset;
+            """.trimIndent())
+            }.body()
+
+            val gamesBatch = json.decodeFromString(ListSerializer(serializer<Game>()), gamesJson)
+            if (gamesBatch.isEmpty()) break
+
+            val coverIds = gamesBatch.mapNotNull { it.cover }
+            val platformIds = gamesBatch.flatMap { it.platforms ?: emptyList() }.distinct()
+            val genreIds = gamesBatch.flatMap { it.genres ?: emptyList() }.distinct()
+
+            val (coverUrls, platformNames, genreNames) = awaitAll(
+                async { fetchCovers(coverIds) },
+                async { fetchPlatforms(platformIds) },
+                async { fetchGenres(genreIds) }
+            )
+
+            val validGames = gamesBatch.mapNotNull { game ->
+                val url = coverUrls[game.cover]
+                if (url != null) {
+                    val platformNamesList = game.platforms?.mapNotNull { platformNames[it] } ?: listOf("Desconocida")
+                    val genreNamesList = game.genres?.mapNotNull { genreNames[it] } ?: listOf("Sin género")
+
+                    game.copy(
+                        coverUrl = url,
+                        platform = platformNamesList.firstOrNull() ?: "Desconocida",
+                        platformNames = platformNamesList,
+                        genreNames = genreNamesList
+                    )
+                } else null
+            }
+
+            finalGames += validGames
+            offset += batchSize
+        }
+
+        return@coroutineScope finalGames.take(30)
+    }
+
+
 
 
 
