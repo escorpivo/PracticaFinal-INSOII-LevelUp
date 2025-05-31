@@ -89,13 +89,23 @@ fun Route.listRoutes() {
         get("/lists/{id}") {
             val principal = call.principal<JWTPrincipal>()!!
             val userId = principal.payload.getClaim("userId").asInt()
-
             val listId = call.parameters["id"]?.toIntOrNull()
-                ?: return@get call.respond(HttpStatusCode.BadRequest)
+
+            if (listId == null) {
+                println("listId no válido")
+                return@get call.respond(HttpStatusCode.BadRequest, "ID inválido")
+            }
 
             val result = transaction {
-                val list = Lists.select { (Lists.id eq listId) and (Lists.userId eq userId) }
-                    .singleOrNull() ?: return@transaction null
+                println("Buscando lista con id=$listId y userId=$userId")
+
+                val listRow = Lists.select { (Lists.id eq listId) and (Lists.userId eq userId) }
+                    .singleOrNull()
+
+                if (listRow == null) {
+                    println("Lista no encontrada o no pertenece al usuario")
+                    return@transaction null
+                }
 
                 val games = (ListItems innerJoin Games)
                     .select { ListItems.listId eq listId }
@@ -103,13 +113,14 @@ fun Route.listRoutes() {
                         mapOf("id" to it[Games.id], "name" to it[Games.name])
                     }
 
-                mapOf("id" to list[Lists.id].value, "name" to list[Lists.name], "games" to games)
+                mapOf("id" to listRow[Lists.id].value, "name" to listRow[Lists.name], "games" to games)
             }
 
             if (result == null) {
-                call.respond(HttpStatusCode.NotFound, "Lista no encontrada")
+                call.respond(HttpStatusCode.NotFound, "Lista no encontrada o no pertenece al usuario")
             } else {
                 call.respond(result)
             }
         }
+    }
 }
