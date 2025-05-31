@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Card, CardContent } from '@mui/material';
+import './Favorites.css';
+import HeartBrokenIcon from '@mui/icons-material/HeartBroken';
 
 const baseUrl = window.location.hostname === 'localhost'
   ? 'http://localhost:8080'
@@ -31,25 +33,49 @@ const Favorites = ({ token }) => {
     fetchFavorites();
   }, [token]);
 
+  const removeFavorite = async (gameId) => {
+  try {
+    const res = await fetch(`${baseUrl}/favorites/${gameId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) throw new Error("Error al eliminar");
+
+    setFavorites(prev => prev.filter(g => g.id !== gameId));
+  } catch (err) {
+    console.error("Error al eliminar favorito:", err);
+  }
+};
+
+
   return (
-    <Box p={4}>
-      <Typography variant="h4" gutterBottom>Mis Favoritos</Typography>
+    <Box className="favorites-container">
+      <Typography className="favorites-title" gutterBottom variant="h3">
+        Mis Favoritos
+      </Typography>
 
       {error && <Typography color="error">{error}</Typography>}
-
       <Grid container spacing={2}>
-        {favorites.map(game => (
-          <Grid item xs={12} sm={6} md={4} key={game.id}>
-            <Card>
-              <img src={game.coverUrl || '/fallback.png'} alt={game.name} style={{ width: '100%' }} />
+        <div className="favorites-grid">
+          {favorites.map(game => (
+            <div key={game.id} className="favorites-card">
+              <img src={game.coverUrl || '/fallback.png'} alt={game.name} />
               <CardContent>
                 <Typography variant="h6">{game.name}</Typography>
+                <button className="remove-button" onClick={() => removeFavorite(game.id)}>
+                  <HeartBrokenIcon fontSize="small" /> Quitar
+                </button>
               </CardContent>
-            </Card>
-          </Grid>
-        ))}
+
+            </div>
+          ))}
+        </div>
       </Grid>
     </Box>
+
   );
 };
 
