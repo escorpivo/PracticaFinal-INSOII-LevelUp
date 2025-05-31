@@ -149,17 +149,24 @@ const GameDetail = ({ game }) => {
       <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={4} mb={4}>
         <Box sx={{ ml: { md: '20%' } }}>
           <img
-            src={game.coverUrl}
-            alt={game.name}
-            style={{ maxWidth: 300, borderRadius: 8 }}
+              src={game.coverUrl}
+              alt={game.name}
+              style={{ maxWidth: 300, borderRadius: 8 }}
           />
         </Box>
-        <Box sx={{ flex: 1, mr: { md: '25%' } }}>
-          <Typography variant="body1" sx={{ textAlign: 'justify' }}>
-            {game.storyline || 'No hay storyline disponible.'}
-          </Typography>
+        <Box className="storyline-scroll"
+            sx={{
+              flex: 1,
+              mr: { md: '25%' },
+              paddingRight: '6px',
+              textAlign: 'justify',
+            }}
+        >
+          {game.storyline || 'No hay storyline disponible.'}
         </Box>
+
       </Box>
+
 
       {/* 1) MEDIA DE PUNTUACIONES */}
       <Box sx={{ ml: { md: '20%' }, mt: 4 }}>
