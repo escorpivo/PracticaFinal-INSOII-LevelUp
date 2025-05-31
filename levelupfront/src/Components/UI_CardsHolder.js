@@ -1,6 +1,7 @@
-import React from "react";
-import { Box, Grid, Button } from "@mui/material";
+import {React, useEffect} from "react";
+import { Box, Grid, Button, Typography } from "@mui/material";
 import Card from "./UI_Card";
+
 
 const baseUrl = window.location.hostname === "localhost"
   ? "http://localhost:8080"
@@ -17,6 +18,11 @@ const CardsHolder = ({
   page,
   setPage
 }) => {
+
+//al pasar de página desplaza hacia arriba y se ve la pantalla de carga
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page]);
 
   // Función para marcar como favorito: hace POST y actualiza estado local
   const addToFavorites = async (gameId, name, coverUrl) => {
@@ -81,10 +87,12 @@ const CardsHolder = ({
         <Button
             variant="outlined"
             onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-            disabled={page === 0}
-        >
+            disabled={page === 0}>
           ← Anterior
         </Button>
+
+        <Typography variant="body1">Página {page + 1}</Typography>
+
         <Button
             variant="outlined"
             onClick={() => setPage((prev) => prev + 1)}
