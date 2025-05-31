@@ -2,8 +2,12 @@ import React from "react";
 import { AppBar, Toolbar, Button, Box } from "@mui/material";
 import SearchBar from "./UI_Searchbar";
 import { useNavigate } from "react-router-dom";
+import HomeIcon from "@mui/icons-material/Home";
+import IconButton from "@mui/material/IconButton";
+import Fade from "@mui/material/Fade";
 
-const TopNav = ({ onChangeView, onSearch  }) => {
+
+const TopNav = ({ onChangeView, onSearch, resetToHome, searchQuery }) => {
     const navigate = useNavigate();
 
     return (
@@ -45,7 +49,7 @@ const TopNav = ({ onChangeView, onSearch  }) => {
                     Biblioteca
                     </Button>
                     <Button color="inherit" sx={{ fontWeight: "bold" }}>
-                        Estadísticas
+                        Comentarios
                     </Button>
                     <Button
                         color="inherit"
@@ -59,9 +63,15 @@ const TopNav = ({ onChangeView, onSearch  }) => {
                     </Button>
                 </Box>
 
-                <Box sx={{ marginLeft: "auto" }}>
-                    <SearchBar onSearch={onSearch} />
+                <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 1 }}>
+                    <SearchBar
+                        onSearch={onSearch}
+                        searchQuery={searchQuery}
+                        resetToHome={resetToHome}
+                    />
                 </Box>
+
+
             </Toolbar>
         </AppBar>
     );
