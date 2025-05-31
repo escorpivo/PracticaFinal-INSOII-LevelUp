@@ -169,3 +169,34 @@ body.dark .card-back-content {
 .card-info-button:hover {
   background-color: #0056b3;
 }
+
+
+/*Estilos de el scroll dentro de la carta*/
+.storyline-scroll {
+  max-height: 430px;
+  overflow-y: auto;
+  padding-right: 6px;
+  text-align: justify;
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Scroll estilo fino */
+.storyline-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.storyline-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+/*Modo oscuro */
+body.dark .storyline-scroll {
+  color: #c0c0c0;
+}
+
+body.dark .storyline-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.25);
+}
