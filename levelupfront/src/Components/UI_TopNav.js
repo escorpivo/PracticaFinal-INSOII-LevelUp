@@ -48,8 +48,14 @@ const TopNav = ({ onChangeView, onSearch, resetToHome, searchQuery }) => {
                     >
                     Biblioteca
                     </Button>
-                    <Button color="inherit" sx={{ fontWeight: "bold" }}>
-                        Comentarios
+                    <Button 
+                        color="inherit" 
+                        sx={{ fontWeight: "bold" }}
+                        onClick={() => {
+                            onChangeView("reviews");
+                            navigate("/reviews");
+                        }}>
+                        Reseñas
                     </Button>
                     <Button
                         color="inherit"
