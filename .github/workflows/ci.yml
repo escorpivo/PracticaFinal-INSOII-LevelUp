@@ -10,6 +10,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+      JWT_REALM: ${{ secrets.JWT_REALM }}
+
     steps:
       - uses: actions/checkout@v3
 
