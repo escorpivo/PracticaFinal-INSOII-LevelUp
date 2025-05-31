@@ -84,7 +84,7 @@ tasks {
 
 // Deshabilito los tests temporalmente
 tasks.test {
-    enabled = false
+    enabled = true
 }
 
 // Tarea para copiar el frontend compilado al directorio de recursos de Ktor
