@@ -78,10 +78,10 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
         authorize()
 
         val finalGames = mutableListOf<Game>()
-        var offset = page * 24
-        val batchSize = 8
+        var offset = page * 30
+        val batchSize = 10
 
-        while (finalGames.size < 24) {
+        while (finalGames.size < 30) {
             val gamesJson: String = httpClient.post("https://api.igdb.com/v4/games") {
                 header("Client-ID", clientId)
                 header("Authorization", "Bearer $accessToken")
@@ -130,7 +130,7 @@ class IGDBClient(private val clientId: String, private val clientSecret: String)
             println("Página $page → Offset procesado: $offset | Juegos válidos acumulados: ${finalGames.size}")
         }
 
-        return@coroutineScope finalGames.take(24)
+        return@coroutineScope finalGames.take(30)
     }
 
 
