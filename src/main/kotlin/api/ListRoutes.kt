@@ -13,6 +13,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.insertAndGetId
+import api.dto.CustomListDTO
+import api.dto.GameDTO
+
 
 fun Route.listRoutes() {
 
@@ -81,21 +84,33 @@ fun Route.listRoutes() {
             val principal = call.principal<JWTPrincipal>()!!
             val userId = principal.payload.getClaim("userId").asInt()
 
-            val lists = transaction {
-                Lists.select { Lists.userId eq userId }
-                    .map { row ->
-                        val listId = row[Lists.id].value
-                        val games = (ListItems innerJoin Games)
-                            .select { ListItems.listId eq listId }
-                            .map {
-                                mapOf("id" to it[Games.id], "name" to it[Games.name])
-                            }
-                        mapOf("id" to listId, "name" to row[Lists.name], "games" to games)
-                    }
-            }
+            try {
+                val lists = transaction {
+                    Lists.select { Lists.userId eq userId }
+                        .map { row ->
+                            val listId = row[Lists.id].value
+                            val games = (ListItems innerJoin Games)
+                                .select { ListItems.listId eq listId }
+                                .map {
+                                    GameDTO(it[Games.id], it[Games.name])
+                                }
 
-            call.respond(lists)
+                            CustomListDTO(
+                                id = listId,
+                                name = row[Lists.name],
+                                games = games
+                            )
+                        }
+                }
+
+
+                call.respond(lists)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                call.respond(HttpStatusCode.InternalServerError, "Error al obtener las listas")
+            }
         }
+
 
         get("/lists/{id}") {
             val principal = call.principal<JWTPrincipal>()!!
