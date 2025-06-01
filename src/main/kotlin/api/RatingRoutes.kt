@@ -34,16 +34,31 @@ fun Route.ratingRoutes() {
 
       transaction {
         Games.insertIgnore {
-          it[Games.id]   = req.gameId
-          it[Games.name] = req.gameName
+            it[id] = req.gameId
+            it[name] = req.gameName
         }
-        Ratings.insert {
-          it[Ratings.userId]   = userId
-          it[Ratings.gameId]   = req.gameId
-          it[Ratings.score]    = req.score.toInt()
-          it[Ratings.gameName] = req.gameName
+
+        val existing = Ratings.select {
+            (Ratings.userId eq userId) and (Ratings.gameId eq req.gameId)
+        }.firstOrNull()
+
+        if (existing != null) {
+            Ratings.update({
+                (Ratings.userId eq userId) and (Ratings.gameId eq req.gameId)
+            }) {
+                it[score] = req.score.toInt()
+                it[gameName] = req.gameName
+            }
+        } else {
+            Ratings.insert {
+                it[Ratings.userId] = userId
+                it[Ratings.gameId] = req.gameId
+                it[score] = req.score.toInt()
+                it[gameName] = req.gameName
+            }
         }
-      }
+    }
+
 
       call.respond(HttpStatusCode.Created)
     }

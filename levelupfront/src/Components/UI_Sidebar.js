@@ -170,12 +170,6 @@ const Sidebar = ({
 
       <Divider sx={{ width: "100%", my: 1 }} />
 
-      {/*Categoria*/}
-      <Box width="100%" display="flex" alignItems="center" gap={1}>
-        <IconButton><CategoryIcon /></IconButton>
-        {isExpanded && <Typography variant="body2">Categoría</Typography>}
-      </Box>
-
       {/*Favoritos*/}
       <Box width="100%" display="flex" alignItems="center" gap={1}>
         <IconButton onClick={() => navigate('/favorites')} title="Ir a favoritos">
