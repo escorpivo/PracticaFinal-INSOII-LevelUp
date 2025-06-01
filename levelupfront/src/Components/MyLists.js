@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Typography, Card, CardContent, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  List,
+  ListItem,
+  ListItemText
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const baseUrl = window.location.hostname === "localhost"
   ? "http://localhost:8080"
@@ -19,7 +30,12 @@ const MyLists = () => {
             Authorization: `Bearer ${token}`
           }
         });
-        setLists(res.data);
+        // Asegurar que cada lista tiene un array de juegos
+        const parsed = res.data.map((list) => ({
+          ...list,
+          games: Array.isArray(list.games) ? list.games : []
+        }));
+        setLists(parsed);
       } catch (err) {
         console.error("Error fetching lists:", err);
       } finally {
@@ -39,12 +55,29 @@ const MyLists = () => {
         <Typography>No tienes listas creadas.</Typography>
       ) : (
         lists.map((list) => (
-          <Card key={list.id} sx={{ mb: 2 }}>
-            <CardContent>
-              <Typography variant="h6">{list.name}</Typography>
-              <Typography variant="body2">Juegos: {list.games?.length || 0}</Typography>
-            </CardContent>
-          </Card>
+          <Accordion key={list.id} sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Box>
+                <Typography variant="h6">{list.name}</Typography>
+                <Typography variant="body2">Juegos: {list.games.length}</Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              {list.games.length > 0 ? (
+                <List dense>
+                  {list.games.map((game) => (
+                    <ListItem key={game.id}>
+                      <ListItemText primary={game.name} />
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  Esta lista no contiene juegos.
+                </Typography>
+              )}
+            </AccordionDetails>
+          </Accordion>
         ))
       )}
     </Box>
