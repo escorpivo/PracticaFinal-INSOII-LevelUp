@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Card, CardContent } from '@mui/material';
+import { Box, Typography, Grid, CardContent } from '@mui/material';
 import './Favorites.css';
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken';
+import { Link } from 'react-router-dom';
 
 const baseUrl = window.location.hostname === 'localhost'
   ? 'http://localhost:8080'
@@ -34,22 +35,21 @@ const Favorites = ({ token }) => {
   }, [token]);
 
   const removeFavorite = async (gameId) => {
-  try {
-    const res = await fetch(`${baseUrl}/favorites/${gameId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    try {
+      const res = await fetch(`${baseUrl}/favorites/${gameId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
-    if (!res.ok) throw new Error("Error al eliminar");
+      if (!res.ok) throw new Error("Error al eliminar");
 
-    setFavorites(prev => prev.filter(g => g.id !== gameId));
-  } catch (err) {
-    console.error("Error al eliminar favorito:", err);
-  }
-};
-
+      setFavorites(prev => prev.filter(g => g.id !== gameId));
+    } catch (err) {
+      console.error("Error al eliminar favorito:", err);
+    }
+  };
 
   return (
     <Box className="favorites-container">
@@ -61,21 +61,31 @@ const Favorites = ({ token }) => {
       <Grid container spacing={2}>
         <div className="favorites-grid">
           {favorites.map(game => (
-            <div key={game.id} className="favorites-card">
+            <Link
+              to={`/game/${game.id}`}
+              state={game}
+              key={game.id}
+              className="favorites-card"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
               <img src={game.coverUrl || '/fallback.png'} alt={game.name} />
               <CardContent>
-                <Typography variant="h6">{game.name}</Typography>
-                <button className="remove-button" onClick={() => removeFavorite(game.id)}>
+                <Typography variant="h6" align="center">{game.name}</Typography>
+                <button
+                  className="remove-button"
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    removeFavorite(game.id);
+                  }}
+                >
                   <HeartBrokenIcon fontSize="small" /> Quitar
                 </button>
               </CardContent>
-
-            </div>
+            </Link>
           ))}
         </div>
       </Grid>
     </Box>
-
   );
 };
 

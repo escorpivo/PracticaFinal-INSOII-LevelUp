@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 const StarRating = ({
   initialRating = 0,
   readOnly = false,
-  size = "2rem"
+  size = "2rem",
+  onRate = () => {}           
 }) => {
   const [rating, setRating] = useState(initialRating);
 
@@ -22,10 +23,11 @@ const StarRating = ({
     } else {
       newValue = index;
     }
+
     setRating(newValue);
+    onRate(newValue);     
   };
 
-  // Render static stars when readOnly to avoid hover/color changes
   const Star = ({ index }) => {
     const isFull = rating >= index;
     const isHalf = rating + 0.5 === index;
@@ -34,7 +36,7 @@ const StarRating = ({
     return (
       <span
         key={index}
-        style={{ fontSize: size, color, userSelect: "none" }}
+        style={{ fontSize: size, color, userSelect: "none", cursor: readOnly ? "default" : "pointer" }}
         onClick={readOnly ? undefined : (e) => handleClick(index, e)}
       >
         {char}
@@ -48,5 +50,6 @@ const StarRating = ({
     </div>
   );
 };
+
 
 export default StarRating;

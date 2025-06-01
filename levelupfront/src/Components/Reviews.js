@@ -36,7 +36,6 @@ const Reviews = ({ token }) => {
 
       {reviews.map((review, index) => (
         <Card key={`${review.gameId}-${index}`} className="review-card">
-          <img src={review.coverUrl || '/fallback.png'} alt={review.name} />
           <CardContent>
             <Box display="flex" justifyContent="space-between" alignItems="center">
               <Typography variant="h6">{review.name}</Typography>
