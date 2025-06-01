@@ -12,6 +12,7 @@ import {
   ListItemText
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Link } from "react-router-dom";
 
 const baseUrl = window.location.hostname === "localhost"
   ? "http://localhost:8080"
@@ -67,7 +68,16 @@ const MyLists = () => {
                 <List dense>
                   {list.games.map((game) => (
                     <ListItem key={game.id}>
-                      <ListItemText primary={game.name} />
+                      <ListItemText
+                        primary={
+                          <Link
+                            to={`/game/${game.id}`}
+                            style={{ color: '#90caf9', textDecoration: 'none' }}
+                          >
+                            {game.name}
+                          </Link>
+                        }
+                      />
                     </ListItem>
                   ))}
                 </List>
