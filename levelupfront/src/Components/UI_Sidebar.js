@@ -18,8 +18,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 import { useNavigate } from 'react-router-dom';
 
-
-
 const GENRE_LIST = [
   "Sin género",
   "Action",
@@ -188,7 +186,9 @@ const Sidebar = ({
 
       {/*añadir*/}
       <Box width="100%" display="flex" alignItems="center" gap={1}>
-        <IconButton><AddIcon /></IconButton>
+        <IconButton onClick={() => navigate('/add-list')} title="Ir a crear lista">
+          <AddIcon />
+        </IconButton>
         {isExpanded && <Typography variant="body2">Añadir</Typography>}
       </Box>
 

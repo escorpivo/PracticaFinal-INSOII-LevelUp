@@ -12,6 +12,7 @@ import {
   Chip
 } from "@mui/material";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const baseUrl = window.location.hostname === "localhost"
   ? "http://localhost:8080"
@@ -24,6 +25,8 @@ const AddListForm = () => {
   const [selectedGameIds, setSelectedGameIds] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -38,26 +41,19 @@ const AddListForm = () => {
     setError("");
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
-        `${baseUrl}/lists`,
-        { name },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const listId = res.data.listId;
 
-      for (const gameId of selectedGameIds) {
-        await fetch(`${baseUrl}/lists/${listId}/add`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ gameId })
-        });
-      }
+      // Crear lista y añadir juegos en un solo paso
+      await axios.post(`${baseUrl}/lists`, {
+        name,
+        games: selectedGameIds.map(id => {
+          const game = games.find(g => g.id === id);
+          return { id: game.id, name: game.name };
+        })
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-
-      setSuccess("Lista creada y juegos añadidos correctamente.");
+      setSuccess("Lista creada correctamente.");
       setName("");
       setSelectedGameIds([]);
     } catch (err) {
@@ -114,6 +110,15 @@ const AddListForm = () => {
         sx={{ mt: 2 }}
       >
         CREAR LISTA
+      </Button>
+
+      <Button
+        fullWidth
+        variant="outlined"
+        onClick={() => navigate('/my-lists')}
+        sx={{ mt: 2 }}
+      >
+        Ver listas creadas
       </Button>
     </Box>
   );

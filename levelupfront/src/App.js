@@ -19,8 +19,7 @@ import Favorites from './Components/Favorites';
 import CustomListForm from "./Components/CustomListForm";
 import CustomListDetail from './Components/CustomListDetail';
 import Reviews from './Components/Reviews';
-
-
+import MyLists from './Components/MyLists';
 
 import {
   Box,
@@ -402,6 +401,30 @@ function AppContent() {
                 onLogout={handleLogout}
               >
                 <Reviews token={token} />
+              </MainLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+
+        <Route
+          path="/my-lists"
+          element={
+            token ? (
+              <MainLayout
+                activeView={activeView}
+                setActiveView={setActiveView}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                selectedGenre={selectedGenre}
+                setSelectedGenre={setSelectedGenre}
+                selectedPlatform={selectedPlatform}
+                setSelectedPlatform={setSelectedPlatform}
+                onSearch={handleSearch}
+                onLogout={handleLogout}
+              >
+                <MyLists />
               </MainLayout>
             ) : (
               <Navigate to="/login" />
