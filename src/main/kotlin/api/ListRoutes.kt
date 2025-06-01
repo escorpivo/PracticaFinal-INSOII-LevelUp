@@ -22,28 +22,39 @@ fun Route.listRoutes() {
             val principal = call.principal<JWTPrincipal>()!!
             val userId = principal.payload.getClaim("userId").asInt()
 
-            val data = call.receive<Map<String, Any>>()
-            val name = data["name"] as? String ?: return@post call.respond(HttpStatusCode.BadRequest)
-            val gameIds = data["gameIds"] as? List<Int> ?: emptyList()
+            val request = call.receive<CreateListRequest>()
 
-            val listId = transaction {
-                val insertedId = Lists.insertAndGetId {
-                    it[Lists.userId] = userId
-                    it[Lists.name] = name
-                }.value
+            try {
+                val listId = transaction {
+                    val insertedId = Lists.insertAndGetId {
+                        it[Lists.userId] = userId
+                        it[Lists.name] = request.name
+                    }.value
 
-                gameIds.forEach { gameId ->
-                    ListItems.insertIgnore {
-                        it[ListItems.listId] = insertedId
-                        it[ListItems.gameId] = gameId.toLong()
+                    request.games.forEach { game ->
+                        Games.insertIgnore {
+                            it[Games.id] = game.id
+                            it[Games.name] = game.name
+                        }
+
+                        ListItems.insertIgnore {
+                            it[ListItems.listId] = insertedId
+                            it[ListItems.gameId] = game.id
+                        }
                     }
+
+
+                    insertedId
                 }
 
-                insertedId
+                call.respond(HttpStatusCode.Created, mapOf("listId" to listId))
+            } catch (e: Exception) {
+                e.printStackTrace()  // Lo verás en consola
+                call.respond(HttpStatusCode.InternalServerError, "Error interno al crear la lista")
             }
-
-            call.respond(HttpStatusCode.Created, mapOf("listId" to listId))
         }
+
+
 
 
         post("/lists/{listId}/add") {
