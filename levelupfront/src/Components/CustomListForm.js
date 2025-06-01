@@ -39,31 +39,25 @@ const AddListForm = () => {
     try {
       const token = localStorage.getItem("token");
 
-      // 1. Crear lista
-      const res = await axios.post(`${baseUrl}/lists`, { name }, {
+      // Crear lista y añadir juegos en un solo paso
+      const res = await axios.post(`${baseUrl}/lists`, {
+        name,
+        games: selectedGameIds.map(id => {
+          const game = games.find(g => g.id === id);
+          return { id: game.id, name: game.name };
+        })
+      }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      const listId = res.data.listId;
 
-      // 2. Añadir juegos
-      await axios.post(`${baseUrl}/lists/${listId}/add`, {
-        gameIds: selectedGameIds
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      setSuccess("Lista creada y juegos añadidos correctamente.");
+      setSuccess("Lista creada correctamente.");
       setName("");
       setSelectedGameIds([]);
     } catch (err) {
       setError("Error al crear la lista");
     }
   };
-
   return (
     <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
       <Typography variant="h5" gutterBottom fontWeight="bold">
