@@ -29,9 +29,12 @@ TODO, resto de la descripción.
 - Buscador de Juegos con detalles 🔍 (sinopsis, año, etc.).
 - Lista de favoritos, valoraciones 🌟.
 
+## 🖥️ Ejecución:
+- La app puede ser accedida directamente mediante render, está desplegada en **[https://practicafinal-insoii-levelup.onrender.com](https://practicafinal-insoii-levelup.onrender.com)**.
+- Para ejecución en local, se puede lanzar desde terminal, estando en la carpeta correspondiente al frontend (PracticaFinal-INSOII-LevelUp\levelupfront).
+    - Primeramente ejecutar **npm install** y luego **npm run build**, con esto se generará una build estática con la última versión del front.
+    - por último, desde la misma terminal, en la raíz del proyecto (/PracticaFinal-INSOII-LevelUp), ejecutar **./gradlew run** y, se abrirá en **localhost:8080** la versión funcional de la App.
   
-📌Extras: Funcionalidad de login para personalizar las recomendaciones con persistencia en base de datos.
-
 # 🧙‍♂️ Participantes.
 
 | Nombre                   | Correo electrónico                       |
